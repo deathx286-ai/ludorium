@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://b0jp8l15jk8a7"]
+
+[ext_resource type="Script" uid="uid://dahrrmgtifmo" path="res://scripts/units/soldier.gd" id="1_jlwbg"]
+[ext_resource type="PackedScene" uid="uid://csn1jjtmwi7d8" path="res://scenes/units/EnemyUnit.tscn" id="2_enemy_unit"]
+[ext_resource type="Script" uid="uid://dvwcpb1baslgc" path="res://scripts/buildings/unit_spawner_building.gd" id="3_onbnv"]
+
+[sub_resource type="Gradient" id="Gradient_jlwbg"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_g3g4i"]
+gradient = SubResource("Gradient_jlwbg")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xxdj2"]
+radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xxdj2"]
+size = Vector2(64, 64)
+
+[sub_resource type="Gradient" id="Gradient_lulwx"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ix1e5"]
+gradient = SubResource("Gradient_lulwx")
+
+[node name="TestMap" type="Node2D" unique_id=26370686]
+
+[node name="Soldier" type="CharacterBody2D" parent="." unique_id=842101967 groups=["player"]]
+position = Vector2(575, 324)
+script = ExtResource("1_jlwbg")
+attack_range = 50.0
+show_attack_range_debug = false
+
+[node name="Sprite2D" type="Sprite2D" parent="Soldier" unique_id=906032019]
+texture = SubResource("GradientTexture2D_g3g4i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Soldier" unique_id=695754471]
+shape = SubResource("CircleShape2D_xxdj2")
+
+[node name="SelectionCircle" type="Polygon2D" parent="Soldier" unique_id=1756579760]
+
+[node name="Hitbox" type="Area2D" parent="Soldier" unique_id=447713109]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Soldier/Hitbox" unique_id=2136857581]
+shape = SubResource("RectangleShape2D_xxdj2")
+debug_color = Color(0.6313726, 0.5294118, 0, 0.21176471)
+
+[node name="HealthBar" type="ProgressBar" parent="Soldier" unique_id=1041953263]
+offset_left = -32.0
+offset_top = -45.0
+offset_right = 96.0
+offset_bottom = -18.0
+scale = Vector2(0.5, 0.5)
+show_percentage = false
+
+[node name="UnitSpawnerBuilding" type="Node2D" parent="." unique_id=535447109]
+position = Vector2(900, 350)
+script = ExtResource("3_onbnv")
+spawn_unit_scene = ExtResource("2_enemy_unit")
+
+[node name="Sprite2D" type="Sprite2D" parent="UnitSpawnerBuilding" unique_id=1263780189]
+texture = SubResource("GradientTexture2D_ix1e5")

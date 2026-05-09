@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "veridion_light_siege_ballista"
+display_name = "Light Siege Ballista"
+description = "Light Siege Ballista prototype unit data."
+max_health = 110
+damage = 18
+attack_range_tiles = 4
+attack_cooldown = 1.8
+move_speed = 95.0
+vision_range_tiles = 7
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 3
+unit_archetype = 9
+unit_role = 27
+culture_tag = "human"
+origin_nation_id = "veridion"
+divine_faction_id = "neutral"
+unit_tags = ["human", "neutral", "mercenary", "kingdom", "merchant", "spy", "balanced", "baseline", "light_siege", "ballista"]
+xp_reward = 5
+gold_reward = 1

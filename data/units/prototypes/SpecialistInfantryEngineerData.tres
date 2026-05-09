@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "prototype_specialist_infantry_engineer"
+display_name = "Specialist Infantry Engineer"
+description = "Specialist Infantry Engineer prototype unit data."
+max_health = 75
+damage = 7
+attack_range_tiles = 1
+attack_cooldown = 1.0
+move_speed = 170.0
+vision_range_tiles = 6
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 0
+unit_archetype = 2
+unit_role = 6
+culture_tag = "prototype"
+origin_nation_id = "prototype"
+divine_faction_id = "neutral"
+unit_tags = ["prototype", "specialist_infantry", "engineer"]
+xp_reward = 6
+gold_reward = 1

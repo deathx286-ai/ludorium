@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "veridion_arcane_ranged_hexer"
+display_name = "Arcane Ranged Hexer"
+description = "Arcane Ranged Hexer prototype unit data."
+max_health = 65
+damage = 14
+attack_range_tiles = 3
+attack_cooldown = 1.4
+move_speed = 150.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 1
+unit_archetype = 5
+unit_role = 16
+culture_tag = "human"
+origin_nation_id = "veridion"
+divine_faction_id = "neutral"
+unit_tags = ["human", "neutral", "mercenary", "kingdom", "merchant", "spy", "balanced", "baseline", "arcane_ranged", "hexer"]
+xp_reward = 5
+gold_reward = 1

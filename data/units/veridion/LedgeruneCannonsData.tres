@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "veridion_arcane_siege_rune_cannon"
+display_name = "Arcane Siege Rune Cannon"
+description = "Arcane Siege Rune Cannon prototype unit data."
+max_health = 130
+damage = 28
+attack_range_tiles = 4
+attack_cooldown = 2.2
+move_speed = 75.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 3
+unit_archetype = 11
+unit_role = 33
+culture_tag = "human"
+origin_nation_id = "veridion"
+divine_faction_id = "neutral"
+unit_tags = ["human", "neutral", "mercenary", "kingdom", "merchant", "spy", "balanced", "baseline", "arcane_siege", "rune_cannon"]
+xp_reward = 5
+gold_reward = 1

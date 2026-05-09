@@ -1,0 +1,345 @@
+[gd_resource type="Resource" script_class="NationData" format=3 uid="uid://b3p3xh03kip5x"]
+
+[ext_resource type="Script" uid="uid://cuknk2sipbwn5" path="res://scripts/data/nation_data.gd" id="1_nation"]
+[ext_resource type="Script" uid="uid://dkwvtfy1gschh" path="res://scripts/data/nation_roster_category.gd" id="2_category"]
+[ext_resource type="Script" uid="uid://csbqdgia2jdlr" path="res://scripts/data/nation_roster_slot.gd" id="3_slot"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/CharterLumberyardData.tres" id="b1"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/CrownlandFarmsData.tres" id="b2"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/MerchantExchangeData.tres" id="b3"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/CrownstoneQuarryData.tres" id="b4"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/GuildFoundryData.tres" id="b5"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/VeridionBarracksData.tres" id="b6"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/GuildWorkshopData.tres" id="b7"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/MercenaryHallData.tres" id="b8"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/WatchtowerData.tres" id="b9"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/MarketwallData.tres" id="b10"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/CouncilGateData.tres" id="b11"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/SpyhavenData.tres" id="b12"]
+[ext_resource type="Resource" path="res://data/buildings/veridion/TradeResourceCampData.tres" id="b13"]
+[ext_resource type="Resource" path="res://data/units/veridion/CrossroadSkirmishersData.tres" id="u1"]
+[ext_resource type="Resource" path="res://data/units/veridion/BorderScoutsData.tres" id="u2"]
+[ext_resource type="Resource" path="res://data/units/veridion/FreebladeRaidersData.tres" id="u3"]
+[ext_resource type="Resource" path="res://data/units/veridion/VeridionGuardData.tres" id="u4"]
+[ext_resource type="Resource" path="res://data/units/veridion/CouncilShieldmenData.tres" id="u5"]
+[ext_resource type="Resource" path="res://data/units/veridion/ContractMaulersData.tres" id="u6"]
+[ext_resource type="Resource" path="res://data/units/veridion/ContractArchersData.tres" id="u7"]
+[ext_resource type="Resource" path="res://data/units/veridion/WatchtowerCrossbowmenData.tres" id="u8"]
+[ext_resource type="Resource" path="res://data/units/veridion/SpyhavenSchemersData.tres" id="u9"]
+[ext_resource type="Resource" path="res://data/units/veridion/ContractBallistaData.tres" id="u10"]
+[ext_resource type="Resource" path="res://data/units/veridion/TollgateRamsData.tres" id="u11"]
+[ext_resource type="Resource" path="res://data/units/veridion/LedgeruneCannonsData.tres" id="u12"]
+[ext_resource type="Resource" path="res://data/units/prototypes/SpecialistInfantryEngineerData.tres" id="u13"]
+[ext_resource type="Resource" path="res://data/units/prototypes/LightCavalryOutriderData.tres" id="u14"]
+[ext_resource type="Resource" path="res://data/units/prototypes/HeavyCavalryKnightData.tres" id="u15"]
+[ext_resource type="Resource" path="res://data/units/prototypes/WarBeastMaulerData.tres" id="u16"]
+[ext_resource type="Resource" path="res://data/units/prototypes/LightAirScoutFlyerData.tres" id="u17"]
+[ext_resource type="Resource" path="res://data/units/prototypes/HeavyAirDrakeData.tres" id="u18"]
+[ext_resource type="Resource" path="res://data/units/prototypes/ArcaneAirSpiritData.tres" id="u19"]
+[ext_resource type="Resource" path="res://data/units/prototypes/MartialChampionDuelistData.tres" id="u20"]
+[ext_resource type="Resource" path="res://data/units/prototypes/ArcaneChampionInvokerData.tres" id="u21"]
+[ext_resource type="Resource" path="res://data/units/prototypes/DivineFallenChampionChosenData.tres" id="u22"]
+
+[sub_resource type="Resource" id="slot_light_infantry_skirmisher"]
+script = ExtResource("3_slot")
+unit_data = ExtResource("u1")
+
+[sub_resource type="Resource" id="slot_light_infantry_scout"]
+script = ExtResource("3_slot")
+unit_role = 1
+unit_data = ExtResource("u2")
+
+[sub_resource type="Resource" id="slot_light_infantry_raider"]
+script = ExtResource("3_slot")
+unit_role = 2
+unit_data = ExtResource("u3")
+
+[sub_resource type="Resource" id="category_light_infantry"]
+script = ExtResource("2_category")
+category_id = "light_infantry"
+display_name = "Light Infantry"
+slots = Array[Resource]([SubResource("slot_light_infantry_skirmisher"), SubResource("slot_light_infantry_scout"), SubResource("slot_light_infantry_raider")])
+
+[sub_resource type="Resource" id="slot_heavy_infantry_vanguard"]
+script = ExtResource("3_slot")
+unit_archetype = 1
+unit_role = 3
+unit_data = ExtResource("u4")
+
+[sub_resource type="Resource" id="slot_heavy_infantry_shieldbearer"]
+script = ExtResource("3_slot")
+unit_archetype = 1
+unit_role = 4
+unit_data = ExtResource("u5")
+
+[sub_resource type="Resource" id="slot_heavy_infantry_bruiser"]
+script = ExtResource("3_slot")
+unit_archetype = 1
+unit_role = 5
+unit_data = ExtResource("u6")
+
+[sub_resource type="Resource" id="category_heavy_infantry"]
+script = ExtResource("2_category")
+category_id = "heavy_infantry"
+display_name = "Heavy Infantry"
+unit_archetype = 1
+slots = Array[Resource]([SubResource("slot_heavy_infantry_vanguard"), SubResource("slot_heavy_infantry_shieldbearer"), SubResource("slot_heavy_infantry_bruiser")])
+
+[sub_resource type="Resource" id="slot_light_ranged_archer"]
+script = ExtResource("3_slot")
+unit_domain = 1
+unit_archetype = 3
+unit_role = 9
+unit_data = ExtResource("u7")
+
+[sub_resource type="Resource" id="category_light_ranged"]
+script = ExtResource("2_category")
+category_id = "light_ranged"
+display_name = "Light Ranged"
+unit_domain = 1
+unit_archetype = 3
+slots = Array[Resource]([SubResource("slot_light_ranged_archer")])
+
+[sub_resource type="Resource" id="slot_heavy_ranged_crossbowman"]
+script = ExtResource("3_slot")
+unit_domain = 1
+unit_archetype = 4
+unit_role = 13
+unit_data = ExtResource("u8")
+
+[sub_resource type="Resource" id="category_heavy_ranged"]
+script = ExtResource("2_category")
+category_id = "heavy_ranged"
+display_name = "Heavy Ranged"
+unit_domain = 1
+unit_archetype = 4
+slots = Array[Resource]([SubResource("slot_heavy_ranged_crossbowman")])
+
+[sub_resource type="Resource" id="slot_arcane_ranged_hexer"]
+script = ExtResource("3_slot")
+unit_domain = 1
+unit_archetype = 5
+unit_role = 16
+unit_data = ExtResource("u9")
+
+[sub_resource type="Resource" id="category_arcane_ranged"]
+script = ExtResource("2_category")
+category_id = "arcane_ranged"
+display_name = "Arcane Ranged"
+unit_domain = 1
+unit_archetype = 5
+slots = Array[Resource]([SubResource("slot_arcane_ranged_hexer")])
+
+[sub_resource type="Resource" id="slot_light_siege_ballista"]
+script = ExtResource("3_slot")
+unit_domain = 3
+unit_archetype = 9
+unit_role = 27
+unit_data = ExtResource("u10")
+
+[sub_resource type="Resource" id="category_light_siege"]
+script = ExtResource("2_category")
+category_id = "light_siege"
+display_name = "Light Siege"
+unit_domain = 3
+unit_archetype = 9
+slots = Array[Resource]([SubResource("slot_light_siege_ballista")])
+
+[sub_resource type="Resource" id="slot_heavy_siege_battering_ram"]
+script = ExtResource("3_slot")
+unit_domain = 3
+unit_archetype = 10
+unit_role = 32
+unit_data = ExtResource("u11")
+
+[sub_resource type="Resource" id="category_heavy_siege"]
+script = ExtResource("2_category")
+category_id = "heavy_siege"
+display_name = "Heavy Siege"
+unit_domain = 3
+unit_archetype = 10
+slots = Array[Resource]([SubResource("slot_heavy_siege_battering_ram")])
+
+[sub_resource type="Resource" id="slot_arcane_siege_rune_cannon"]
+script = ExtResource("3_slot")
+unit_domain = 3
+unit_archetype = 11
+unit_role = 33
+unit_data = ExtResource("u12")
+
+[sub_resource type="Resource" id="category_arcane_siege"]
+script = ExtResource("2_category")
+category_id = "arcane_siege"
+display_name = "Arcane Siege"
+unit_domain = 3
+unit_archetype = 11
+slots = Array[Resource]([SubResource("slot_arcane_siege_rune_cannon")])
+
+[sub_resource type="Resource" id="slot_specialist_infantry_engineer"]
+script = ExtResource("3_slot")
+unit_archetype = 2
+unit_role = 6
+unit_data = ExtResource("u13")
+
+[sub_resource type="Resource" id="category_specialist_infantry"]
+script = ExtResource("2_category")
+category_id = "specialist_infantry"
+display_name = "Specialist Infantry"
+unit_archetype = 2
+slots = Array[Resource]([SubResource("slot_specialist_infantry_engineer")])
+
+[sub_resource type="Resource" id="slot_light_cavalry_outrider"]
+script = ExtResource("3_slot")
+unit_domain = 2
+unit_archetype = 6
+unit_role = 18
+unit_data = ExtResource("u14")
+
+[sub_resource type="Resource" id="category_light_cavalry"]
+script = ExtResource("2_category")
+category_id = "light_cavalry"
+display_name = "Light Cavalry"
+unit_domain = 2
+unit_archetype = 6
+slots = Array[Resource]([SubResource("slot_light_cavalry_outrider")])
+
+[sub_resource type="Resource" id="slot_heavy_cavalry_knight"]
+script = ExtResource("3_slot")
+unit_domain = 2
+unit_archetype = 7
+unit_role = 22
+unit_data = ExtResource("u15")
+
+[sub_resource type="Resource" id="category_heavy_cavalry"]
+script = ExtResource("2_category")
+category_id = "heavy_cavalry"
+display_name = "Heavy Cavalry"
+unit_domain = 2
+unit_archetype = 7
+slots = Array[Resource]([SubResource("slot_heavy_cavalry_knight")])
+
+[sub_resource type="Resource" id="slot_war_beast_mauler"]
+script = ExtResource("3_slot")
+unit_domain = 2
+unit_archetype = 8
+unit_role = 24
+unit_data = ExtResource("u16")
+
+[sub_resource type="Resource" id="category_war_beast"]
+script = ExtResource("2_category")
+category_id = "war_beast"
+display_name = "War Beast"
+unit_domain = 2
+unit_archetype = 8
+slots = Array[Resource]([SubResource("slot_war_beast_mauler")])
+
+[sub_resource type="Resource" id="slot_light_air_scout_flyer"]
+script = ExtResource("3_slot")
+movement_type = 1
+unit_domain = 4
+unit_archetype = 12
+unit_role = 36
+unit_data = ExtResource("u17")
+
+[sub_resource type="Resource" id="category_light_air"]
+script = ExtResource("2_category")
+category_id = "light_air"
+display_name = "Light Air"
+unit_domain = 4
+unit_archetype = 12
+slots = Array[Resource]([SubResource("slot_light_air_scout_flyer")])
+
+[sub_resource type="Resource" id="slot_heavy_air_drake"]
+script = ExtResource("3_slot")
+movement_type = 1
+unit_domain = 4
+unit_archetype = 13
+unit_role = 40
+unit_data = ExtResource("u18")
+
+[sub_resource type="Resource" id="category_heavy_air"]
+script = ExtResource("2_category")
+category_id = "heavy_air"
+display_name = "Heavy Air"
+unit_domain = 4
+unit_archetype = 13
+slots = Array[Resource]([SubResource("slot_heavy_air_drake")])
+
+[sub_resource type="Resource" id="slot_arcane_air_spirit"]
+script = ExtResource("3_slot")
+movement_type = 1
+unit_domain = 4
+unit_archetype = 14
+unit_role = 42
+unit_data = ExtResource("u19")
+
+[sub_resource type="Resource" id="category_arcane_air"]
+script = ExtResource("2_category")
+category_id = "arcane_air"
+display_name = "Arcane Air"
+unit_domain = 4
+unit_archetype = 14
+slots = Array[Resource]([SubResource("slot_arcane_air_spirit")])
+
+[sub_resource type="Resource" id="slot_martial_champion_duelist"]
+script = ExtResource("3_slot")
+unit_domain = 5
+unit_archetype = 15
+unit_role = 45
+unit_data = ExtResource("u20")
+
+[sub_resource type="Resource" id="category_martial_champion"]
+script = ExtResource("2_category")
+category_id = "martial_champion"
+display_name = "Martial Champion"
+unit_domain = 5
+unit_archetype = 15
+slots = Array[Resource]([SubResource("slot_martial_champion_duelist")])
+
+[sub_resource type="Resource" id="slot_arcane_champion_invoker"]
+script = ExtResource("3_slot")
+unit_domain = 5
+unit_archetype = 16
+unit_role = 48
+unit_data = ExtResource("u21")
+
+[sub_resource type="Resource" id="category_arcane_champion"]
+script = ExtResource("2_category")
+category_id = "arcane_champion"
+display_name = "Arcane Champion"
+unit_domain = 5
+unit_archetype = 16
+slots = Array[Resource]([SubResource("slot_arcane_champion_invoker")])
+
+[sub_resource type="Resource" id="slot_divine_fallen_champion_chosen"]
+script = ExtResource("3_slot")
+unit_domain = 5
+unit_archetype = 17
+unit_role = 52
+unit_data = ExtResource("u22")
+
+[sub_resource type="Resource" id="category_divine_fallen_champion"]
+script = ExtResource("2_category")
+category_id = "divine_fallen_champion"
+display_name = "Divine/Fallen Champion"
+unit_domain = 5
+unit_archetype = 17
+slots = Array[Resource]([SubResource("slot_divine_fallen_champion_chosen")])
+
+[resource]
+script = ExtResource("1_nation")
+nation_id = "veridion"
+display_name = "Veridion"
+description = "Veridion starter civilization data."
+divine_faction_id = "neutral"
+culture_tags = Array[String](["human", "neutral", "mercenary"])
+nation_tags = Array[String](["neutral", "kingdom", "merchant", "mercenary", "spy", "balanced", "baseline"])
+primary_color = Color(0.78, 0.78, 0.74, 1)
+secondary_color = Color(0.95, 0.72, 0.23, 1)
+available_units = Array[Resource]([ExtResource("u1"), ExtResource("u2"), ExtResource("u3"), ExtResource("u4"), ExtResource("u5"), ExtResource("u6"), ExtResource("u7"), ExtResource("u8"), ExtResource("u9"), ExtResource("u10"), ExtResource("u11"), ExtResource("u12"), ExtResource("u13"), ExtResource("u14"), ExtResource("u15"), ExtResource("u16"), ExtResource("u17"), ExtResource("u18"), ExtResource("u19"), ExtResource("u20"), ExtResource("u21"), ExtResource("u22")])
+starting_units = Array[Resource]([ExtResource("u1"), ExtResource("u2"), ExtResource("u3")])
+unique_units = Array[Resource]([ExtResource("u1"), ExtResource("u2"), ExtResource("u3"), ExtResource("u4"), ExtResource("u5"), ExtResource("u6"), ExtResource("u7"), ExtResource("u8"), ExtResource("u9"), ExtResource("u10"), ExtResource("u11"), ExtResource("u12"), ExtResource("u13"), ExtResource("u14"), ExtResource("u15"), ExtResource("u16"), ExtResource("u17"), ExtResource("u18"), ExtResource("u19"), ExtResource("u20"), ExtResource("u21"), ExtResource("u22")])
+roster_categories = Array[Resource]([SubResource("category_light_infantry"), SubResource("category_heavy_infantry"), SubResource("category_light_ranged"), SubResource("category_heavy_ranged"), SubResource("category_arcane_ranged"), SubResource("category_light_siege"), SubResource("category_heavy_siege"), SubResource("category_arcane_siege"), SubResource("category_specialist_infantry"), SubResource("category_light_cavalry"), SubResource("category_heavy_cavalry"), SubResource("category_war_beast"), SubResource("category_light_air"), SubResource("category_heavy_air"), SubResource("category_arcane_air"), SubResource("category_martial_champion"), SubResource("category_arcane_champion"), SubResource("category_divine_fallen_champion")])
+available_buildings = Array[Resource]([ExtResource("b1"), ExtResource("b2"), ExtResource("b3"), ExtResource("b4"), ExtResource("b5"), ExtResource("b6"), ExtResource("b7"), ExtResource("b8"), ExtResource("b9"), ExtResource("b10"), ExtResource("b11"), ExtResource("b12"), ExtResource("b13")])
+resource_buildings = Array[Resource]([ExtResource("b1"), ExtResource("b2"), ExtResource("b3"), ExtResource("b4"), ExtResource("b5")])
+military_buildings = Array[Resource]([ExtResource("b6"), ExtResource("b7"), ExtResource("b8"), ExtResource("b12")])
+defense_buildings = Array[Resource]([ExtResource("b9"), ExtResource("b10"), ExtResource("b11")])

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "emberhold_light_infantry_scout"
+display_name = "Light Infantry Scout"
+description = "Light Infantry Scout prototype unit data."
+max_health = 70
+damage = 8
+attack_range_tiles = 1
+attack_cooldown = 0.8
+move_speed = 190.0
+vision_range_tiles = 6
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 0
+unit_archetype = 0
+unit_role = 1
+culture_tag = "dwarf"
+origin_nation_id = "emberhold"
+divine_faction_id = "primal_elements"
+unit_tags = ["dwarf", "fire_genasi", "forge", "fire", "volcanic", "durable", "siege", "heavy_infantry", "metal", "stone", "light_infantry", "scout"]
+xp_reward = 5
+gold_reward = 1

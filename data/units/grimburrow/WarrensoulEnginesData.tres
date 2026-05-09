@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "grimburrow_arcane_siege_soul_engine"
+display_name = "Arcane Siege Soul Engine"
+description = "Arcane Siege Soul Engine prototype unit data."
+max_health = 130
+damage = 28
+attack_range_tiles = 4
+attack_cooldown = 2.2
+move_speed = 75.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 3
+unit_archetype = 11
+unit_role = 34
+culture_tag = "goblin"
+origin_nation_id = "grimburrow"
+divine_faction_id = "chaotic_gambit"
+unit_tags = ["goblin", "warrens", "wild_magic", "cheap_units", "raiders", "saboteurs", "enemy_camps", "scrap", "arcane_siege", "soul_engine"]
+xp_reward = 5
+gold_reward = 1

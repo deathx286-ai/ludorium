@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "prototype_martial_champion_duelist"
+display_name = "Martial Champion Duelist"
+description = "Martial Champion Duelist prototype unit data."
+max_health = 180
+damage = 22
+attack_range_tiles = 1
+attack_cooldown = 1.0
+move_speed = 180.0
+vision_range_tiles = 7
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 5
+unit_archetype = 15
+unit_role = 45
+culture_tag = "prototype"
+origin_nation_id = "prototype"
+divine_faction_id = "neutral"
+unit_tags = ["prototype", "martial_champion", "duelist"]
+xp_reward = 18
+gold_reward = 6

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "prototype_arcane_air_spirit"
+display_name = "Arcane Air Spirit"
+description = "Arcane Air Spirit prototype unit data."
+max_health = 90
+damage = 12
+attack_range_tiles = 3
+attack_cooldown = 1.15
+move_speed = 215.0
+vision_range_tiles = 7
+footprint_width = 1
+footprint_height = 1
+movement_type = 1
+unit_domain = 4
+unit_archetype = 14
+unit_role = 42
+culture_tag = "prototype"
+origin_nation_id = "prototype"
+divine_faction_id = "neutral"
+unit_tags = ["prototype", "arcane_air", "spirit"]
+xp_reward = 11
+gold_reward = 3

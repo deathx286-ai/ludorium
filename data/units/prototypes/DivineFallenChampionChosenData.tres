@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "prototype_divine_fallen_champion_chosen"
+display_name = "Divine/Fallen Champion Chosen"
+description = "Divine/Fallen Champion Chosen prototype unit data."
+max_health = 165
+damage = 19
+attack_range_tiles = 2
+attack_cooldown = 1.15
+move_speed = 170.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 5
+unit_archetype = 17
+unit_role = 52
+culture_tag = "prototype"
+origin_nation_id = "prototype"
+divine_faction_id = "neutral"
+unit_tags = ["prototype", "divine_fallen_champion", "chosen"]
+xp_reward = 18
+gold_reward = 6

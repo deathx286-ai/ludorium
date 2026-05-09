@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://c4qmcjytm7dqs"]
+
+[ext_resource type="Script" uid="uid://cunkgqmj5ojem" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "grimburrow_enemy_camp_structure_spawner"
+display_name = "Enemy Camp Structure Spawner"
+description = "Enemy Camp Structure Spawner prototype unit data."
+max_health = 150
+damage = 0
+attack_range_tiles = 0
+move_speed = 0.0
+footprint_width = 2
+footprint_height = 2
+movement_type = 4
+unit_domain = 6
+unit_archetype = 20
+unit_role = 60
+can_move = false
+is_structure = true
+culture_tag = "goblin"
+origin_nation_id = "grimburrow"
+divine_faction_id = "chaotic_gambit"
+unit_tags = Array[String](["goblin", "warrens", "wild_magic", "cheap_units", "raiders", "saboteurs", "enemy_camps", "scrap", "enemy_camp_structure", "spawner"])
+xp_reward = 25
+gold_reward = 10

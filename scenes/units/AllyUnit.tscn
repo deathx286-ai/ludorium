@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/units/ally_unit.gd" id="1_ally"]
+[ext_resource type="Script" path="res://scenes/units/unit_tile_sizer.gd" id="2_sizer"]
+[ext_resource type="Script" path="res://scenes/units/tile_movement_component.gd" id="3_move"]
+[ext_resource type="Resource" path="res://data/units/SoldierData.tres" id="4_unit_data"]
+[ext_resource type="Script" path="res://scripts/components/unit_classification.gd" id="5_classification"]
+
+[sub_resource type="Gradient" id="Gradient_ally"]
+colors = PackedColorArray(0.1, 0.55, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ally"]
+gradient = SubResource("Gradient_ally")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ally"]
+radius = 11.2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ally"]
+size = Vector2(64, 64)
+
+[node name="AllyUnit" type="CharacterBody2D" groups=["ally"]]
+script = ExtResource("1_ally")
+unit_data = ExtResource("4_unit_data")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_ally")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ally")
+
+[node name="Hitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_ally")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -32.0
+offset_top = -50.0
+offset_right = 96.0
+offset_bottom = -23.0
+scale = Vector2(0.5, 0.3)
+show_percentage = false
+
+[node name="ClassificationLabel" type="Label" parent="."]
+offset_left = -24.0
+offset_top = -13.0
+offset_right = 24.0
+offset_bottom = 13.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "??"
+
+[node name="UnitTileSizer" type="Node" parent="."]
+script = ExtResource("2_sizer")
+
+[node name="TileMovementComponent" type="Node" parent="."]
+script = ExtResource("3_move")
+
+[node name="UnitClassification" type="Node" parent="."]
+script = ExtResource("5_classification")

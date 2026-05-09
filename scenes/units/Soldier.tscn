@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://ct2xjaw1re4sn"]
+
+[ext_resource type="Script" uid="uid://dahrrmgtifmo" path="res://scripts/units/soldier.gd" id="1_eu5ba"]
+[ext_resource type="Script" uid="uid://cqwfhg1q4n307" path="res://scenes/units/unit_tile_sizer.gd" id="2_4p2mn"]
+[ext_resource type="Script" uid="uid://de1hv5qx4dv48" path="res://scenes/units/tile_movement_component.gd" id="3_gqhmt"]
+[ext_resource type="Resource" path="res://data/units/SoldierData.tres" id="4_soldier_data"]
+[ext_resource type="Script" path="res://scripts/components/unit_classification.gd" id="5_classification"]
+
+[sub_resource type="Gradient" id="Gradient_jlwbg"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_g3g4i"]
+gradient = SubResource("Gradient_jlwbg")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xxdj2"]
+radius = 11.2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xxdj2"]
+size = Vector2(64, 64)
+
+[node name="Soldier" type="CharacterBody2D" unique_id=666106218 groups=["player"]]
+position = Vector2(32, 0)
+script = ExtResource("1_eu5ba")
+unit_data = ExtResource("4_soldier_data")
+show_attack_range_debug = false
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1775544140]
+texture = SubResource("GradientTexture2D_g3g4i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=265281792]
+shape = SubResource("CircleShape2D_xxdj2")
+
+[node name="SelectionCircle" type="Polygon2D" parent="." unique_id=1961700622]
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=708606284]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1395217520]
+shape = SubResource("RectangleShape2D_xxdj2")
+debug_color = Color(0.6313726, 0.5294118, 0, 0.21176471)
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=1015336079]
+offset_left = -32.0
+offset_top = -50.0
+offset_right = 96.0
+offset_bottom = -23.0
+scale = Vector2(0.5, 0.3)
+show_percentage = false
+metadata/_edit_use_anchors_ = true
+
+[node name="ClassificationLabel" type="Label" parent="."]
+offset_left = -24.0
+offset_top = -13.0
+offset_right = 24.0
+offset_bottom = 13.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "??"
+
+[node name="UnitTileSizer" type="Node" parent="." unique_id=2067103137]
+script = ExtResource("2_4p2mn")
+
+[node name="TileMovementComponent" type="Node" parent="." unique_id=1925553108]
+script = ExtResource("3_gqhmt")
+
+[node name="UnitClassification" type="Node" parent="."]
+script = ExtResource("5_classification")

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "veridion_heavy_infantry_shieldbearer"
+display_name = "Heavy Infantry Shieldbearer"
+description = "Heavy Infantry Shieldbearer prototype unit data."
+max_health = 120
+damage = 12
+attack_range_tiles = 1
+attack_cooldown = 1.0
+move_speed = 140.0
+vision_range_tiles = 5
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 0
+unit_archetype = 1
+unit_role = 4
+culture_tag = "human"
+origin_nation_id = "veridion"
+divine_faction_id = "neutral"
+unit_tags = ["human", "neutral", "mercenary", "kingdom", "merchant", "spy", "balanced", "baseline", "heavy_infantry", "shieldbearer"]
+xp_reward = 5
+gold_reward = 1

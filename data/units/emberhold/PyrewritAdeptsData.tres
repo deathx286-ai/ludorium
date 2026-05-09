@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "emberhold_arcane_ranged_battlemage"
+display_name = "Arcane Ranged Battlemage"
+description = "Arcane Ranged Battlemage prototype unit data."
+max_health = 65
+damage = 14
+attack_range_tiles = 3
+attack_cooldown = 1.4
+move_speed = 150.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 1
+unit_archetype = 5
+unit_role = 15
+culture_tag = "dwarf"
+origin_nation_id = "emberhold"
+divine_faction_id = "primal_elements"
+unit_tags = ["dwarf", "fire_genasi", "forge", "fire", "volcanic", "durable", "siege", "heavy_infantry", "metal", "stone", "arcane_ranged", "battlemage"]
+xp_reward = 5
+gold_reward = 1

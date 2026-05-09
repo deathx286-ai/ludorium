@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "embervault_exchange"
+display_name = "Embervault Exchange"
+description = "Embervault Exchange is a Emberhold building."
+max_health = 200
+footprint_width = 2
+footprint_height = 2
+movement_type = 4
+unit_domain = 6
+unit_archetype = 18
+unit_role = 62
+resource_type = 3
+resource_amount_per_tick = 5
+resource_tick_seconds = 3.0
+is_resource_building = true
+is_production_building = false
+is_defense_building = false
+is_wall = false
+is_gate = false
+is_enemy_camp = false
+can_attack = false
+damage = 0
+attack_range_tiles = 0
+attack_cooldown = 1.5
+culture_tag = "dwarf"
+origin_nation_id = "emberhold"
+divine_faction_id = "primal_elements"
+building_tags = ["dwarf", "fire_genasi", "forge", "fire", "volcanic", "durable", "siege", "heavy_infantry", "metal", "stone", "production_structure", "resource_camp"]

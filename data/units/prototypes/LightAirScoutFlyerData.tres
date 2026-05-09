@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "prototype_light_air_scout_flyer"
+display_name = "Light Air Scout Flyer"
+description = "Light Air Scout Flyer prototype unit data."
+max_health = 65
+damage = 8
+attack_range_tiles = 1
+attack_cooldown = 0.8
+move_speed = 240.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 1
+unit_domain = 4
+unit_archetype = 12
+unit_role = 36
+culture_tag = "prototype"
+origin_nation_id = "prototype"
+divine_faction_id = "neutral"
+unit_tags = ["prototype", "light_air", "scout_flyer"]
+xp_reward = 7
+gold_reward = 2

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "veridion_heavy_ranged_crossbowman"
+display_name = "Heavy Ranged Crossbowman"
+description = "Heavy Ranged Crossbowman prototype unit data."
+max_health = 75
+damage = 11
+attack_range_tiles = 3
+attack_cooldown = 1.2
+move_speed = 145.0
+vision_range_tiles = 7
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 1
+unit_archetype = 4
+unit_role = 13
+culture_tag = "human"
+origin_nation_id = "veridion"
+divine_faction_id = "neutral"
+unit_tags = ["human", "neutral", "mercenary", "kingdom", "merchant", "spy", "balanced", "baseline", "heavy_ranged", "crossbowman"]
+xp_reward = 5
+gold_reward = 1

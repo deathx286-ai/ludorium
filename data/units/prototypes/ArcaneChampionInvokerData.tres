@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "prototype_arcane_champion_invoker"
+display_name = "Arcane Champion Invoker"
+description = "Arcane Champion Invoker prototype unit data."
+max_health = 140
+damage = 20
+attack_range_tiles = 3
+attack_cooldown = 1.25
+move_speed = 165.0
+vision_range_tiles = 8
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 5
+unit_archetype = 16
+unit_role = 48
+culture_tag = "prototype"
+origin_nation_id = "prototype"
+divine_faction_id = "neutral"
+unit_tags = ["prototype", "arcane_champion", "invoker"]
+xp_reward = 18
+gold_reward = 6

@@ -1,0 +1,209 @@
+﻿[gd_resource type="Resource" script_class="NationData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/nation_data.gd" id="1_nation"]
+[ext_resource type="Script" path="res://scripts/data/nation_roster_category.gd" id="2_category"]
+[ext_resource type="Script" path="res://scripts/data/nation_roster_slot.gd" id="3_slot"]
+[ext_resource type="Resource" path="res://data/units/emberhold/AshrunKnifemenData.tres" id="u1"]
+[ext_resource type="Resource" path="res://data/units/emberhold/SoottrailPathfindersData.tres" id="u2"]
+[ext_resource type="Resource" path="res://data/units/emberhold/CinderbrandReaversData.tres" id="u3"]
+[ext_resource type="Resource" path="res://data/units/emberhold/AnvilboundOathguardData.tres" id="u4"]
+[ext_resource type="Resource" path="res://data/units/emberhold/HearthwallSentinelsData.tres" id="u5"]
+[ext_resource type="Resource" path="res://data/units/emberhold/CindermaulBreakersData.tres" id="u6"]
+[ext_resource type="Resource" path="res://data/units/emberhold/EmberstringHuntersData.tres" id="u7"]
+[ext_resource type="Resource" path="res://data/units/emberhold/IrongutBoltmenData.tres" id="u8"]
+[ext_resource type="Resource" path="res://data/units/emberhold/PyrewritAdeptsData.tres" id="u9"]
+[ext_resource type="Resource" path="res://data/units/emberhold/CrucibleBallistaData.tres" id="u10"]
+[ext_resource type="Resource" path="res://data/units/emberhold/AnviljawRamsData.tres" id="u11"]
+[ext_resource type="Resource" path="res://data/units/emberhold/GodfireCulverinsData.tres" id="u12"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/CharwoodYardData.tres" id="b1"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/AshgrainTerraceData.tres" id="b2"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/EmbervaultExchangeData.tres" id="b3"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/BasaltQuarryData.tres" id="b4"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/VulkrunSmelteryData.tres" id="b5"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/EmberholdBarracksData.tres" id="b6"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/VulkrunForgeworksData.tres" id="b7"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/RuneSmelterWorkshopData.tres" id="b8"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/HearthwallTowerData.tres" id="b9"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/BasaltWallData.tres" id="b10"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/IronflameGateData.tres" id="b11"]
+[ext_resource type="Resource" path="res://data/buildings/emberhold/VolcanicResourceCampData.tres" id="b12"]
+
+[sub_resource type="Resource" id="slot_light_infantry_skirmisher"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 0
+unit_archetype = 0
+unit_role = 0
+unit_data = ExtResource("u1")
+
+[sub_resource type="Resource" id="slot_light_infantry_scout"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 0
+unit_archetype = 0
+unit_role = 1
+unit_data = ExtResource("u2")
+
+[sub_resource type="Resource" id="slot_light_infantry_raider"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 0
+unit_archetype = 0
+unit_role = 2
+unit_data = ExtResource("u3")
+
+[sub_resource type="Resource" id="category_light_infantry"]
+script = ExtResource("2_category")
+category_id = "light_infantry"
+display_name = "Light Infantry"
+unit_domain = 0
+unit_archetype = 0
+slots = [SubResource("slot_light_infantry_skirmisher"), SubResource("slot_light_infantry_scout"), SubResource("slot_light_infantry_raider")]
+
+[sub_resource type="Resource" id="slot_heavy_infantry_vanguard"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 0
+unit_archetype = 1
+unit_role = 3
+unit_data = ExtResource("u4")
+
+[sub_resource type="Resource" id="slot_heavy_infantry_shieldbearer"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 0
+unit_archetype = 1
+unit_role = 4
+unit_data = ExtResource("u5")
+
+[sub_resource type="Resource" id="slot_heavy_infantry_bruiser"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 0
+unit_archetype = 1
+unit_role = 5
+unit_data = ExtResource("u6")
+
+[sub_resource type="Resource" id="category_heavy_infantry"]
+script = ExtResource("2_category")
+category_id = "heavy_infantry"
+display_name = "Heavy Infantry"
+unit_domain = 0
+unit_archetype = 1
+slots = [SubResource("slot_heavy_infantry_vanguard"), SubResource("slot_heavy_infantry_shieldbearer"), SubResource("slot_heavy_infantry_bruiser")]
+
+[sub_resource type="Resource" id="slot_light_ranged_archer"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 1
+unit_archetype = 3
+unit_role = 9
+unit_data = ExtResource("u7")
+
+[sub_resource type="Resource" id="category_light_ranged"]
+script = ExtResource("2_category")
+category_id = "light_ranged"
+display_name = "Light Ranged"
+unit_domain = 1
+unit_archetype = 3
+slots = [SubResource("slot_light_ranged_archer")]
+
+[sub_resource type="Resource" id="slot_heavy_ranged_crossbowman"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 1
+unit_archetype = 4
+unit_role = 13
+unit_data = ExtResource("u8")
+
+[sub_resource type="Resource" id="category_heavy_ranged"]
+script = ExtResource("2_category")
+category_id = "heavy_ranged"
+display_name = "Heavy Ranged"
+unit_domain = 1
+unit_archetype = 4
+slots = [SubResource("slot_heavy_ranged_crossbowman")]
+
+[sub_resource type="Resource" id="slot_arcane_ranged_battlemage"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 1
+unit_archetype = 5
+unit_role = 15
+unit_data = ExtResource("u9")
+
+[sub_resource type="Resource" id="category_arcane_ranged"]
+script = ExtResource("2_category")
+category_id = "arcane_ranged"
+display_name = "Arcane Ranged"
+unit_domain = 1
+unit_archetype = 5
+slots = [SubResource("slot_arcane_ranged_battlemage")]
+
+[sub_resource type="Resource" id="slot_light_siege_ballista"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 3
+unit_archetype = 9
+unit_role = 27
+unit_data = ExtResource("u10")
+
+[sub_resource type="Resource" id="category_light_siege"]
+script = ExtResource("2_category")
+category_id = "light_siege"
+display_name = "Light Siege"
+unit_domain = 3
+unit_archetype = 9
+slots = [SubResource("slot_light_siege_ballista")]
+
+[sub_resource type="Resource" id="slot_heavy_siege_battering_ram"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 3
+unit_archetype = 10
+unit_role = 32
+unit_data = ExtResource("u11")
+
+[sub_resource type="Resource" id="category_heavy_siege"]
+script = ExtResource("2_category")
+category_id = "heavy_siege"
+display_name = "Heavy Siege"
+unit_domain = 3
+unit_archetype = 10
+slots = [SubResource("slot_heavy_siege_battering_ram")]
+
+[sub_resource type="Resource" id="slot_arcane_siege_rune_cannon"]
+script = ExtResource("3_slot")
+movement_type = 0
+unit_domain = 3
+unit_archetype = 11
+unit_role = 33
+unit_data = ExtResource("u12")
+
+[sub_resource type="Resource" id="category_arcane_siege"]
+script = ExtResource("2_category")
+category_id = "arcane_siege"
+display_name = "Arcane Siege"
+unit_domain = 3
+unit_archetype = 11
+slots = [SubResource("slot_arcane_siege_rune_cannon")]
+
+[resource]
+script = ExtResource("1_nation")
+nation_id = "emberhold"
+display_name = "Emberhold"
+description = "Emberhold starter civilization data."
+divine_faction_id = "primal_elements"
+culture_tags = ["dwarf", "fire_genasi"]
+nation_tags = ["forge", "fire", "volcanic", "durable", "siege", "heavy_infantry", "metal", "stone"]
+primary_color = Color(0.788235, 0.352941, 0.156863, 1)
+secondary_color = Color(0.176471, 0.168627, 0.164706, 1)
+available_units = [ExtResource("u1"), ExtResource("u2"), ExtResource("u3"), ExtResource("u4"), ExtResource("u5"), ExtResource("u6"), ExtResource("u7"), ExtResource("u8"), ExtResource("u9"), ExtResource("u10"), ExtResource("u11"), ExtResource("u12")]
+starting_units = [ExtResource("u1"), ExtResource("u2"), ExtResource("u3")]
+unique_units = [ExtResource("u1"), ExtResource("u2"), ExtResource("u3"), ExtResource("u4"), ExtResource("u5"), ExtResource("u6"), ExtResource("u7"), ExtResource("u8"), ExtResource("u9"), ExtResource("u10"), ExtResource("u11"), ExtResource("u12")]
+roster_categories = [SubResource("category_light_infantry"), SubResource("category_heavy_infantry"), SubResource("category_light_ranged"), SubResource("category_heavy_ranged"), SubResource("category_arcane_ranged"), SubResource("category_light_siege"), SubResource("category_heavy_siege"), SubResource("category_arcane_siege")]
+available_buildings = [ExtResource("b1"), ExtResource("b2"), ExtResource("b3"), ExtResource("b4"), ExtResource("b5"), ExtResource("b6"), ExtResource("b7"), ExtResource("b8"), ExtResource("b9"), ExtResource("b10"), ExtResource("b11"), ExtResource("b12")]
+resource_buildings = [ExtResource("b1"), ExtResource("b2"), ExtResource("b3"), ExtResource("b4"), ExtResource("b5")]
+military_buildings = [ExtResource("b6"), ExtResource("b7"), ExtResource("b8")]
+defense_buildings = [ExtResource("b9"), ExtResource("b10"), ExtResource("b11")]
+
