@@ -31,6 +31,10 @@ class_name UnitData
 @export var can_attack: bool = true
 @export var is_structure: bool = false
 
+@export_group("Economy")
+@export var can_harvest: bool = false
+@export var worker_type: EconomyTypes.WorkerType = EconomyTypes.WorkerType.NONE
+
 @export_group("Identity / Culture")
 @export var culture_tag: String = ""
 @export var origin_nation_id: String = ""

@@ -22,6 +22,7 @@ class_name UnitSpawnerBuilding
 @export var min_spawn_distance_from_units: float = 80.0
 @export var max_spawn_attempts: int = 20
 @export var debug_logging: bool = false
+@export var target_scan_interval: float = 0.25
 
 @export var tile_width: int = 2:
 	set(value):
@@ -50,6 +51,7 @@ var spawned_units: Array[Node] = []
 
 var spawn_timer: float = 0.0
 var attack_timer: float = 0.0
+var target_scan_timer: float = 0.0
 var attack_target: Node2D = null
 var is_destroyed: bool = false
 var cached_grid_manager: Node = null
@@ -70,6 +72,7 @@ var attack_cooldown: float = 1.0
 func _ready():
 	apply_structure_data()
 	update_tile_sizing()
+	_spawn_subtype_indicator()
 	update_process_mode()
 
 	if Engine.is_editor_hint():
@@ -86,6 +89,7 @@ func _ready():
 		world_manager.register_enemy_camp()
 
 	spawn_timer = spawn_interval
+	target_scan_timer = randf() * target_scan_interval
 	cached_grid_manager = get_tree().get_first_node_in_group("grid_manager")
 	cached_occupancy_manager = get_tree().get_first_node_in_group("grid_occupancy_manager")
 
@@ -124,7 +128,7 @@ func update_process_mode():
 	if not is_inside_tree():
 		return
 
-	set_process(Engine.is_editor_hint() or auto_spawn_enabled or can_attack)
+	set_process(Engine.is_editor_hint() or auto_spawn_enabled or should_auto_attack())
 
 func get_tile_size() -> int:
 	var grid_manager = get_grid_manager()
@@ -161,6 +165,7 @@ func apply_structure_data():
 			unit_classification.apply_building_data(building_data)
 
 		update_classification_label()
+		_spawn_subtype_indicator()
 		return
 
 	if unit_data == null:
@@ -184,6 +189,7 @@ func apply_structure_data():
 		unit_classification.apply_unit_data(unit_data)
 
 	update_classification_label()
+	_spawn_subtype_indicator()
 
 func update_tile_sizing():
 	if not is_inside_tree():
@@ -363,15 +369,18 @@ func get_alive_spawned_unit_count() -> int:
 	return count
 
 func process_auto_attack(delta: float):
-	if not can_attack or attack_damage <= 0 or attack_range_tiles <= 0:
+	if not should_auto_attack():
 		return
 
 	attack_timer -= delta
+	target_scan_timer -= delta
 
 	if attack_target != null and not is_valid_attack_target(attack_target):
 		attack_target = null
+		target_scan_timer = 0.0
 
-	if attack_target == null:
+	if attack_target == null and target_scan_timer <= 0.0:
+		target_scan_timer = target_scan_interval
 		attack_target = find_attack_target()
 
 	if attack_target == null or attack_timer > 0.0:
@@ -379,6 +388,15 @@ func process_auto_attack(delta: float):
 
 	attack_timer = attack_cooldown
 	attack_target.take_damage(CombatDamage.calculate_damage(attack_damage, self, attack_target))
+
+func should_auto_attack() -> bool:
+	if not can_attack or attack_damage <= 0 or attack_range_tiles <= 0:
+		return false
+
+	if building_data == null:
+		return false
+
+	return bool(building_data.get("is_defense_building"))
 
 func find_attack_target() -> Node2D:
 	var closest_target: Node2D = null
@@ -613,3 +631,22 @@ func apply_nation_visuals():
 		source_data = unit_data
 
 	NationVisuals.apply_owner_or_data_to_node(self, source_data)
+
+func _spawn_subtype_indicator():
+	if Engine.is_editor_hint():
+		return
+
+	var source_data: Resource = building_data
+	if source_data == null:
+		source_data = unit_data
+
+	var indicator_scene = preload("res://scenes/ui/subtype_indicator.tscn")
+	var indicator = get_node_or_null("SubtypeIndicator")
+	if indicator == null:
+		indicator = indicator_scene.instantiate()
+		indicator.name = "SubtypeIndicator"
+		add_child(indicator)
+
+	indicator.z_index = 2
+	if indicator.has_method("setup"):
+		indicator.setup(source_data, Vector2i(tile_width, tile_height))

@@ -6,6 +6,8 @@ signal resource_changed(resource_type: int, amount: int)
 
 @export var debugger_enabled: bool = true
 @export var player_manager: Node
+@export var resource_manager: Node
+@export var selected_nation: Resource
 @export var resource_scan_root: Node
 @export var status_label: Label
 @export var debug_grant_amount: int = 10
@@ -43,6 +45,14 @@ var _refresh_timer: float = 0.0
 var _last_snapshot: Dictionary = {}
 
 func _ready():
+	if resource_manager == null:
+		resource_manager = get_tree().get_first_node_in_group("resource_manager")
+
+	if selected_nation == null and resource_manager != null:
+		var manager_nations = resource_manager.get("known_nations")
+		if manager_nations is Array and not manager_nations.is_empty():
+			selected_nation = manager_nations[0]
+
 	wood = starting_wood
 	food = starting_food
 	stone = starting_stone
@@ -117,6 +127,11 @@ func get_resource_amount(resource_type: int) -> int:
 			return 0
 
 func set_resource_amount(resource_type: int, amount: int):
+	if resource_manager != null and resource_manager.has_method("set_resource"):
+		resource_manager.call("set_resource", selected_nation, resource_type, amount)
+		refresh_values()
+		return
+
 	var clamped_amount = maxi(amount, 0)
 
 	match resource_type:
@@ -141,6 +156,11 @@ func add_resource(resource_type: int, amount: int):
 	if amount == 0:
 		return
 
+	if resource_manager != null and resource_manager.has_method("add_resource"):
+		resource_manager.call("add_resource", selected_nation, resource_type, amount)
+		refresh_values()
+		return
+
 	if resource_type == BuildingData.ResourceType.GOLD and player_manager != null and player_manager.has_method("gain_gold"):
 		player_manager.gain_gold(amount)
 		return
@@ -150,6 +170,12 @@ func add_resource(resource_type: int, amount: int):
 func spend_resource(resource_type: int, amount: int) -> bool:
 	if amount <= 0:
 		return true
+
+	if resource_manager != null and resource_manager.has_method("spend_resources"):
+		var cost := {resource_type: amount}
+		var spent = bool(resource_manager.call("spend_resources", selected_nation, cost))
+		refresh_values()
+		return spent
 
 	if resource_type == BuildingData.ResourceType.GOLD and player_manager != null and player_manager.has_method("spend_gold"):
 		return player_manager.spend_gold(amount)
@@ -161,7 +187,43 @@ func spend_resource(resource_type: int, amount: int) -> bool:
 	return true
 
 func can_afford(resource_type: int, amount: int) -> bool:
+	if resource_manager != null and resource_manager.has_method("can_afford"):
+		return bool(resource_manager.call("can_afford", selected_nation, {resource_type: amount}))
+
 	return amount <= 0 or get_resource_amount(resource_type) >= amount
+
+func add_all_resources(amount: int):
+	if resource_manager != null and resource_manager.has_method("add_all_resources"):
+		resource_manager.call("add_all_resources", selected_nation, amount)
+		refresh_values()
+		return
+
+	for resource_type in _get_debug_resource_types():
+		add_resource(resource_type, amount)
+
+func can_afford_cost(cost: Dictionary) -> bool:
+	if resource_manager != null and resource_manager.has_method("can_afford"):
+		return bool(resource_manager.call("can_afford", selected_nation, cost))
+
+	for resource_type in EconomyTypes.RESOURCE_TYPES:
+		if get_resource_amount(resource_type) < int(cost.get(resource_type, 0)):
+			return false
+
+	return true
+
+func spend_resources(cost: Dictionary) -> bool:
+	if resource_manager != null and resource_manager.has_method("spend_resources"):
+		var spent = bool(resource_manager.call("spend_resources", selected_nation, cost))
+		refresh_values()
+		return spent
+
+	if not can_afford_cost(cost):
+		return false
+
+	for resource_type in EconomyTypes.RESOURCE_TYPES:
+		spend_resource(resource_type, int(cost.get(resource_type, 0)))
+
+	return true
 
 func get_resource_name(resource_type: int) -> String:
 	match resource_type:
@@ -200,12 +262,21 @@ func _connect_player_manager():
 
 func _sync_player_values():
 	if player_manager == null:
-		return
+		pass
+	else:
+		level = int(player_manager.get("level"))
+		current_xp = int(player_manager.get("current_xp"))
+		xp_needed = int(player_manager.get("xp_needed"))
+		gold = int(player_manager.get("gold"))
 
-	level = int(player_manager.get("level"))
-	current_xp = int(player_manager.get("current_xp"))
-	xp_needed = int(player_manager.get("xp_needed"))
-	gold = int(player_manager.get("gold"))
+	if resource_manager != null and resource_manager.has_method("get_resource_amounts"):
+		var amounts: Dictionary = resource_manager.call("get_resource_amounts", selected_nation)
+		wood = int(amounts.get(BuildingData.ResourceType.WOOD, wood))
+		food = int(amounts.get(BuildingData.ResourceType.FOOD, food))
+		gold = int(amounts.get(BuildingData.ResourceType.GOLD, gold))
+		stone = int(amounts.get(BuildingData.ResourceType.STONE, stone))
+		metal = int(amounts.get(BuildingData.ResourceType.METAL, metal))
+
 	xp_percent = float(current_xp) / float(xp_needed) if xp_needed > 0 else 0.0
 
 func _refresh_income_values():
@@ -304,15 +375,42 @@ func _update_status_label():
 	status_label.text = "DEBUG [Resources] | %s" % get_debug_text()
 
 func get_debug_text() -> String:
-	return "L%s XP %s/%s | %s | Income/s %s | Selected %s | Q/E resource, Space +%s, Shift+Space -%s" % [
+	return "L%s XP %s/%s | %s | Income/s %s | Nation %s | Selected %s | Q/E resource, Space +%s, Shift+Space -%s" % [
 		level,
 		current_xp,
 		xp_needed,
 		_format_amounts(),
 		_format_income(),
+		_get_display_name(selected_nation),
 		get_resource_name(selected_resource_type),
 		debug_grant_amount,
 		debug_grant_amount
+	]
+
+func get_current_debug_summary() -> String:
+	return "Resources | %s | Wood: %s | Gold: %s | Stone: %s | Metal: %s" % [
+		_get_display_name(selected_nation),
+		wood,
+		gold,
+		stone,
+		metal
+	]
+
+func get_debug_state() -> Dictionary:
+	return {
+		"nation": _get_display_name(selected_nation),
+		"amounts": get_resource_amounts(),
+		"income_per_second": get_income_per_second_by_resource(),
+		"selected_resource_type": selected_resource_type,
+		"selected_resource_name": get_resource_name(selected_resource_type),
+		"debug_grant_amount": debug_grant_amount
+	}
+
+func get_debug_shortcuts() -> Array:
+	return [
+		{"keys": "Q/E", "description": "Cycle selected resource"},
+		{"keys": "Space", "description": "Grant selected resource"},
+		{"keys": "Shift+Space", "description": "Spend selected resource"}
 	]
 
 func _format_amounts() -> String:
@@ -359,6 +457,20 @@ func _get_debug_resource_types() -> Array[int]:
 		BuildingData.ResourceType.STONE,
 		BuildingData.ResourceType.METAL
 	]
+
+func _get_display_name(resource: Resource) -> String:
+	if resource == null:
+		return "None"
+
+	var display_name = str(resource.get("display_name"))
+	if not display_name.is_empty():
+		return display_name
+
+	var nation_id = str(resource.get("nation_id"))
+	if not nation_id.is_empty():
+		return nation_id
+
+	return resource.resource_path.get_file()
 
 func _emit_resources_changed_if_needed():
 	var snapshot = get_hud_resource_values()

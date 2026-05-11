@@ -26,6 +26,12 @@
 [ext_resource type="Script" uid="uid://pjn7w05n50js" path="res://scripts/systems/combat_debugger.gd" id="22_combat_debugger"]
 [ext_resource type="PackedScene" uid="uid://b63h160hs8uyu" path="res://scenes/Buildings/UnitSpawnerBuilding.tscn" id="23_unit_spawner_building"]
 [ext_resource type="Script" uid="uid://e0xlyv4ocijw" path="res://scripts/systems/player_unit_selection_manager.gd" id="24_selection_manager"]
+[ext_resource type="Script" uid="uid://cl1nqkl570x3r" path="res://scripts/systems/resource_manager.gd" id="25_resource_manager"]
+[ext_resource type="Script" uid="uid://x5f55yi7fgpu" path="res://scripts/systems/road_supply_manager.gd" id="26_road_supply"]
+[ext_resource type="Theme" uid="uid://b8r0vyl7dna0k" path="res://data/ui/fantasy_theme.tres" id="27_5pyk2"]
+[ext_resource type="Script" uid="uid://bqunr1y5w2bub" path="res://scripts/ui/combat_ui_panel.gd" id="27_y6lxb"]
+[ext_resource type="Script" uid="uid://bk8uano13dbst" path="res://scripts/systems/economy_debug_manager.gd" id="28_economy_debug"]
+[ext_resource type="PackedScene" path="res://scenes/ui/debug_panel.tscn" id="29_debug_panel"]
 
 [node name="TestMap" type="Node2D" unique_id=26370686]
 
@@ -49,10 +55,14 @@ script = ExtResource("7_43vq4")
 [node name="GridOccupancyManager" type="Node" parent="Systems" unique_id=1989092087 groups=["grid_occupancy_manager"]]
 script = ExtResource("8_43vq4")
 
-[node name="RunDiplomacyManager" type="Node" parent="Systems" unique_id=1858433191]
+[node name="RunDiplomacyManager" type="Node" parent="Systems" unique_id=1858433191 groups=["run_diplomacy_manager"]]
 script = ExtResource("9_4l0jn")
 known_nations = Array[Resource]([ExtResource("10_27pcn"), ExtResource("15_veridion"), ExtResource("16_grimburrow")])
 selected_player_nation = ExtResource("10_27pcn")
+
+[node name="ResourceManager" type="Node" parent="Systems" unique_id=1535423423 groups=["resource_manager"]]
+script = ExtResource("25_resource_manager")
+known_nations = Array[Resource]([ExtResource("10_27pcn"), ExtResource("15_veridion"), ExtResource("16_grimburrow")])
 
 [node name="UnitSpawner" type="Node" parent="Systems" unique_id=114865324 node_paths=PackedStringArray("spawn_parent", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager")]
 script = ExtResource("11_2o5ho")
@@ -66,7 +76,7 @@ grid_manager = NodePath("../../GridManager")
 grid_occupancy_manager = NodePath("../GridOccupancyManager")
 metadata/_custom_type_script = "uid://cp56bck561dib"
 
-[node name="BuildingSpawner" type="Node" parent="Systems" unique_id=1838385739 node_paths=PackedStringArray("spawn_parent", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager")]
+[node name="BuildingSpawner" type="Node" parent="Systems" unique_id=1838385739 node_paths=PackedStringArray("spawn_parent", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager", "road_supply_manager")]
 script = ExtResource("13_wvj8d")
 base_building_scene = ExtResource("2_base_building")
 unit_spawner_building_scene = ExtResource("23_unit_spawner_building")
@@ -74,9 +84,10 @@ spawn_parent = NodePath("../..")
 run_diplomacy_manager = NodePath("../RunDiplomacyManager")
 grid_manager = NodePath("../../GridManager")
 grid_occupancy_manager = NodePath("../GridOccupancyManager")
+road_supply_manager = NodePath("../../RoadSupplyManager")
 metadata/_custom_type_script = "uid://dtr48ki0bdnfp"
 
-[node name="PlacementManager" type="Node" parent="Systems" unique_id=2121334467 node_paths=PackedStringArray("unit_spawner", "building_spawner", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager")]
+[node name="PlacementManager" type="Node" parent="Systems" unique_id=2121334467 node_paths=PackedStringArray("unit_spawner", "building_spawner", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager", "resource_manager", "road_supply_manager") groups=["placement_manager"]]
 script = ExtResource("14_place")
 nation_options = Array[Resource]([ExtResource("10_27pcn"), ExtResource("15_veridion"), ExtResource("16_grimburrow")])
 unit_spawner = NodePath("../UnitSpawner")
@@ -84,25 +95,43 @@ building_spawner = NodePath("../BuildingSpawner")
 run_diplomacy_manager = NodePath("../RunDiplomacyManager")
 grid_manager = NodePath("../../GridManager")
 grid_occupancy_manager = NodePath("../GridOccupancyManager")
+resource_manager = NodePath("../ResourceManager")
+road_supply_manager = NodePath("../../RoadSupplyManager")
 
-[node name="DiplomacyDebugger" type="Node" parent="Systems" unique_id=676754155 node_paths=PackedStringArray("run_diplomacy_manager")]
+[node name="DiplomacyDebugger" type="Node" parent="Systems" unique_id=676754155 node_paths=PackedStringArray("run_diplomacy_manager") groups=["diplomacy_debugger"]]
 script = ExtResource("19_diplomacy_debugger")
 run_diplomacy_manager = NodePath("../RunDiplomacyManager")
 
-[node name="ResourcesDebugger" type="Node" parent="Systems" unique_id=180912369 node_paths=PackedStringArray("player_manager", "resource_scan_root") groups=["hud_resource_provider", "resources_debugger"]]
+[node name="ResourcesDebugger" type="Node" parent="Systems" unique_id=180912369 node_paths=PackedStringArray("player_manager", "resource_manager", "resource_scan_root") groups=["hud_resource_provider", "resources_debugger"]]
 script = ExtResource("20_resources_debugger")
 player_manager = NodePath("../PlayerManager")
+resource_manager = NodePath("../ResourceManager")
+selected_nation = ExtResource("10_27pcn")
 resource_scan_root = NodePath("../..")
 
-[node name="CombatDebugger" type="Node" parent="Systems" unique_id=1160733700]
+[node name="CombatDebugger" type="Node" parent="Systems" unique_id=1160733700 groups=["combat_debugger"]]
 script = ExtResource("22_combat_debugger")
 
-[node name="DebugManager" type="Node" parent="Systems" unique_id=1575994728 node_paths=PackedStringArray("placement_manager", "diplomacy_debugger", "resources_debugger", "combat_debugger", "status_label")]
+[node name="EconomyDebugManager" type="Node" parent="Systems" unique_id=839256227 node_paths=PackedStringArray("resource_manager", "road_supply_manager", "placement_manager", "unit_spawner", "building_spawner", "grid_manager", "run_diplomacy_manager", "spawn_parent") groups=["economy_debug_manager"]]
+script = ExtResource("28_economy_debug")
+resource_manager = NodePath("../ResourceManager")
+road_supply_manager = NodePath("../../RoadSupplyManager")
+placement_manager = NodePath("../PlacementManager")
+unit_spawner = NodePath("../UnitSpawner")
+building_spawner = NodePath("../BuildingSpawner")
+grid_manager = NodePath("../../GridManager")
+run_diplomacy_manager = NodePath("../RunDiplomacyManager")
+spawn_parent = NodePath("../..")
+nation_options = Array[Resource]([ExtResource("10_27pcn"), ExtResource("15_veridion"), ExtResource("16_grimburrow")])
+
+[node name="DebugManager" type="Node" parent="Systems" unique_id=1575994728 node_paths=PackedStringArray("placement_manager", "diplomacy_debugger", "resources_debugger", "combat_debugger", "economy_debugger", "debug_panel", "status_label") groups=["debug_manager"]]
 script = ExtResource("21_debug_manager")
 placement_manager = NodePath("../PlacementManager")
 diplomacy_debugger = NodePath("../DiplomacyDebugger")
 resources_debugger = NodePath("../ResourcesDebugger")
 combat_debugger = NodePath("../CombatDebugger")
+economy_debugger = NodePath("../EconomyDebugManager")
+debug_panel = NodePath("../../DebugPanel")
 status_label = NodePath("../../PlacementUI/DebugStatusLabel")
 
 [node name="PlayerSelectionManager" type="Node2D" parent="." unique_id=294147230 node_paths=PackedStringArray("placement_manager", "grid_manager")]
@@ -112,21 +141,131 @@ grid_manager = NodePath("../GridManager")
 
 [node name="MainCamera" type="Camera2D" parent="." unique_id=555430404]
 position = Vector2(640, 360)
-limit_left = -1600
-limit_top = -1120
-limit_right = 1600
-limit_bottom = 1120
+limit_left = -1422
+limit_top = -1359
+limit_right = 1778
+limit_bottom = 881
 script = ExtResource("8_1y0um")
 
 [node name="GridManager" type="Node2D" parent="." unique_id=2076019186 groups=["grid_manager"]]
 script = ExtResource("9_4ykif")
 
+[node name="RoadSupplyManager" type="Node2D" parent="." unique_id=865065464 node_paths=PackedStringArray("grid_manager", "grid_occupancy_manager") groups=["road_supply_manager"]]
+script = ExtResource("26_road_supply")
+grid_manager = NodePath("../GridManager")
+grid_occupancy_manager = NodePath("../Systems/GridOccupancyManager")
+
+[node name="DebugPanel" parent="." unique_id=772315522 node_paths=PackedStringArray("debug_manager", "diplomacy_debugger", "resources_debugger", "combat_debugger", "placement_manager", "economy_debug_manager", "road_supply_manager", "resource_manager", "player_selection_manager") instance=ExtResource("29_debug_panel")]
+debug_manager = NodePath("../Systems/DebugManager")
+diplomacy_debugger = NodePath("../Systems/DiplomacyDebugger")
+resources_debugger = NodePath("../Systems/ResourcesDebugger")
+combat_debugger = NodePath("../Systems/CombatDebugger")
+placement_manager = NodePath("../Systems/PlacementManager")
+economy_debug_manager = NodePath("../Systems/EconomyDebugManager")
+road_supply_manager = NodePath("../RoadSupplyManager")
+resource_manager = NodePath("../Systems/ResourceManager")
+player_selection_manager = NodePath("../PlayerSelectionManager")
+
 [node name="PlacementUI" type="CanvasLayer" parent="." unique_id=170445265]
 
 [node name="DebugStatusLabel" type="Label" parent="PlacementUI" unique_id=1462033137]
-offset_left = 12.0
-offset_top = 12.0
-offset_right = 1260.0
-offset_bottom = 92.0
+offset_left = 5.0
+offset_top = -165.0
+offset_right = 1253.0
+offset_bottom = -85.0
 text = "Debug loading..."
 autowrap_mode = 2
+
+[node name="CombatUIPanel" type="PanelContainer" parent="PlacementUI" unique_id=1109496177]
+custom_minimum_size = Vector2(200, 0)
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = -315.0
+offset_right = 336.0
+offset_bottom = -43.0
+grow_vertical = 0
+theme = ExtResource("27_5pyk2")
+script = ExtResource("27_y6lxb")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlacementUI/CombatUIPanel" unique_id=1661877088]
+layout_mode = 2
+
+[node name="MainHBox" type="HBoxContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer" unique_id=1495767783]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitFrame" type="PanelContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox" unique_id=867208873]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+
+[node name="UnitPortrait" type="TextureRect" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/PortraitFrame" unique_id=1718057746]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox" unique_id=1738296317]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="UnitNameLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1604251046]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54509807, 0.27058825, 0.07450981, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="ArchetypeLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1024150109]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Class: N/A"
+
+[node name="@HSeparator@37796" type="HSeparator" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=104547445]
+layout_mode = 2
+
+[node name="StatsGrid" type="GridContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1135695940]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid" unique_id=1188027388]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=1705732680]
+unique_name_in_owner = true
+layout_mode = 2
+text = "✙ Health (Current/Max): 0/0"
+
+[node name="DamageLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=1810017412]
+unique_name_in_owner = true
+layout_mode = 2
+text = "⚔ Damage (DPS): 0 (0.0)"
+
+[node name="RangeLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=366790162]
+unique_name_in_owner = true
+layout_mode = 2
+text = "➵ Range (Tiles): 0"
+
+[node name="SpeedLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=552909189]
+unique_name_in_owner = true
+layout_mode = 2
+text = "⚡ Atk Speed (Attacks/s): 0.0"
+
+[node name="MoveSpeedLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=358507763]
+unique_name_in_owner = true
+layout_mode = 2
+text = "👣 Movement (Units/s): 0"
+
+[node name="@HSeparator@37801" type="HSeparator" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=619811302]
+layout_mode = 2
+
+[node name="OrderLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1295804176]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Order: Idle"
+
+[node name="TargetLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=908037544]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Target: None"

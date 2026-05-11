@@ -1,75 +1,42 @@
-extends "res://scripts/units/base_unit.gd"
+extends BaseUnit
 
 @export var stop_distance: float = 70.0
 @export var double_click_time: float = 0.30
-@export var show_attack_range_debug: bool = true
 @export var target_scan_interval: float = 0.25
 
 # Helps prevent nearby units from getting stuck together.
 @export var personal_space_radius: float = 45.0
 @export var personal_space_strength: float = 1.25
 
-var is_selected: bool = false
-var was_showing_attack_range: bool = false
-var last_attack_range_cell: Vector2i = Vector2i(-1, -1)
-
-var attack_target: Node2D = null
-var is_chasing_attack_target: bool = false
-var attack_timer: float = 0.0
 var chase_destination_cell: Vector2i = Vector2i(-1, -1)
 var has_assigned_attack_slot: bool = false
 var assigned_attack_slot_cell: Vector2i = Vector2i(-1, -1)
-var target_scan_timer: float = 0.0
 
 var last_click_time: float = -1.0
 var last_clicked_enemy: Node2D = null
 
-@onready var selection_circle: Polygon2D = $SelectionCircle
+@onready var selection_circle: Polygon2D = get_node_or_null("SelectionCircle")
 
 func _ready():
 	super._ready()
+	target_scan_timer = randf() * target_scan_interval
+
 	if debug_logging:
 		print("Soldier HP: ", current_health)
 
-	selection_circle.polygon = PackedVector2Array([
-		Vector2(-24, -24),
-		Vector2(24, -24),
-		Vector2(24, 24),
-		Vector2(-24, 24)
-	])
+	if selection_circle != null:
+		selection_circle.polygon = PackedVector2Array([
+			Vector2(-24, -24),
+			Vector2(24, -24),
+			Vector2(24, 24),
+			Vector2(-24, 24)
+		])
 
-	selection_circle.color = Color(0.2, 0.8, 1.0, 0.35)
-	selection_circle.visible = false
+		selection_circle.color = Color(0.2, 0.8, 1.0, 0.35)
+		selection_circle.visible = false
 
 	if debug_logging:
 		print("Soldier attack range tiles: ", attack_range_tiles)
-
-	queue_redraw()
-
-func _draw():
-	if should_show_attack_range():
-		draw_attack_range_tiles()
-
-func draw_attack_range_tiles():
-	if grid_manager == null:
-		return
-
-	var current_cell = grid_manager.world_to_cell(global_position)
-	var range_cells = grid_manager.get_cells_in_tile_range(
-		current_cell,
-		get_attack_range_tile_count(),
-		false
-	)
-
-	for cell in range_cells:
-		var tile_center = to_local(grid_manager.cell_to_world(cell))
-		var tile_rect = Rect2(
-			tile_center - Vector2.ONE * grid_manager.tile_size / 2.0,
-			Vector2.ONE * grid_manager.tile_size
-		)
-
-		draw_rect(tile_rect, Color(1.0, 0.2, 0.2, 0.12), true)
-		draw_rect(tile_rect, Color(1.0, 0.2, 0.2, 0.65), false, 1.5)
 
 func _input(event):
 	if is_managed_by_selection_manager():
@@ -96,16 +63,14 @@ func handle_left_click():
 		last_click_time = current_click_time
 		last_clicked_enemy = clicked_enemy
 
-		attack_target = clicked_enemy
+		set_current_attack_target(clicked_enemy, is_double_click)
 		issue_attack_target_order(clicked_enemy, is_double_click)
 
 		if is_double_click:
-			is_chasing_attack_target = true
 			chase_destination_cell = Vector2i(-1, -1)
 			if debug_logging:
 				print("Double-click attack chase: ", attack_target.name)
 		else:
-			is_chasing_attack_target = false
 			if debug_logging:
 				print("Attack target set: ", attack_target.name)
 
@@ -116,13 +81,11 @@ func handle_left_click():
 	var distance_to_mouse = global_position.distance_to(mouse_pos)
 
 	if distance_to_mouse <= 35.0:
-		is_selected = true
+		set_selected(true)
 	else:
-		is_selected = false
+		set_selected(false)
 		is_chasing_attack_target = false
 
-	selection_circle.visible = is_selected
-	queue_redraw()
 	if debug_logging:
 		print("Selected: ", is_selected)
 
@@ -130,8 +93,7 @@ func handle_move_command():
 	var clicked_enemy = get_enemy_under_mouse()
 
 	if clicked_enemy != null:
-		attack_target = clicked_enemy
-		is_chasing_attack_target = true
+		set_current_attack_target(clicked_enemy, true)
 		chase_destination_cell = Vector2i(-1, -1)
 		issue_attack_target_order(clicked_enemy, true)
 
@@ -151,75 +113,19 @@ func handle_move_command():
 		return
 
 	issue_move_order(requested_position)
-	attack_target = null
-	is_chasing_attack_target = false
+	clear_current_attack_target(false)
 	clear_assigned_attack_slot()
 
 	if debug_logging:
 		print("Moving to tile position: ", movement_component.target_position)
 
 func _physics_process(delta):
-	attack_timer -= delta
-
-	sync_attack_target_from_order()
+	tick_combat_order_state(delta)
+	if tick_harvest_order(delta):
+		return
 	handle_attack_move_auto_acquire(delta)
-	handle_attack_if_possible()
+	try_attack_current_target("Soldier")
 	handle_movement(delta)
-	update_attack_range_debug_redraw()
-
-func update_attack_range_debug_redraw():
-	var is_showing_attack_range = should_show_attack_range()
-	var should_redraw = was_showing_attack_range != is_showing_attack_range
-
-	if is_showing_attack_range and grid_manager != null:
-		var current_cell = grid_manager.world_to_cell(global_position)
-
-		if current_cell != last_attack_range_cell:
-			last_attack_range_cell = current_cell
-			should_redraw = true
-	elif not is_showing_attack_range:
-		last_attack_range_cell = Vector2i(-1, -1)
-
-	if should_redraw:
-		queue_redraw()
-
-	was_showing_attack_range = is_showing_attack_range
-
-func handle_attack_if_possible():
-	if attack_target == null:
-		return
-
-	if not is_instance_valid(attack_target) or is_attack_target_dead():
-		if is_chasing_attack_target:
-			finish_interrupted_chase_to_tile()
-
-		clear_order_target_if_matching(attack_target)
-		attack_target = null
-		is_chasing_attack_target = false
-		clear_assigned_attack_slot()
-		return
-
-	if movement_component.is_committed_step_in_progress() or not movement_component.is_settled():
-		return
-
-	movement_component.snap_to_tile_center_if_close()
-
-	if is_target_in_attack_tile_range(attack_target):
-		if attack_timer <= 0.0:
-			attack_timer = attack_cooldown
-			if attack_target.has_method("take_damage"):
-				attack_target.take_damage(CombatDamage.calculate_damage(attack_damage, self, attack_target))
-			else:
-				attack_target = null
-			if debug_logging:
-				print("Soldier attacked!")
-
-			if is_attack_target_dead() and is_chasing_attack_target:
-				finish_interrupted_chase_to_tile()
-				clear_order_target_if_matching(attack_target)
-				attack_target = null
-				is_chasing_attack_target = false
-				clear_assigned_attack_slot()
 
 func handle_movement(delta: float):
 	# Double-click chase behavior.
@@ -255,21 +161,20 @@ func handle_attack_move_auto_acquire(delta: float):
 	if attack_target != null:
 		return
 
+	if movement_component.is_committed_step_in_progress():
+		return
+
 	target_scan_timer -= delta
 	if target_scan_timer > 0.0:
 		return
 
 	target_scan_timer = target_scan_interval
-	var target = find_best_attack_target(detection_range)
+	var target = find_best_attack_target(get_auto_acquire_range_pixels(), true)
 
 	if target == null:
 		return
 
-	clear_movement_ignore_nodes()
-	attack_target = target
-	is_chasing_attack_target = true
-	chase_destination_cell = Vector2i(-1, -1)
-	clear_assigned_attack_slot()
+	set_current_attack_target(target, can_chase_attack_target())
 
 func should_follow_destination_order() -> bool:
 	if combat_orders == null or not combat_orders.has_destination:
@@ -330,8 +235,11 @@ func update_chase_path_to_target():
 	if movement_component.is_committed_step_in_progress():
 		return
 
-	var desired_chase_position = get_best_chase_tile_near_target(grid_manager, attack_target)
-	var desired_chase_cell = grid_manager.world_to_cell(desired_chase_position)
+	var desired_chase_cell = get_best_chase_cell_near_target(attack_target)
+	if desired_chase_cell == Vector2i(-1, -1):
+		return
+
+	var desired_chase_position = grid_manager.cell_to_world(desired_chase_cell)
 	var requires_exact_slot = false
 
 	if has_assigned_attack_slot:
@@ -356,26 +264,15 @@ func update_chase_path_to_target():
 
 	chase_destination_cell = desired_chase_cell
 
-func get_best_chase_tile_near_target(grid_manager, target: Node2D) -> Vector2:
-	var target_cells = grid_manager.get_footprint_cells_for_node(target)
-	var blocked_cells = grid_manager.get_blocked_cell_lookup(self)
-	var candidate_cells := {}
-
-	for target_footprint_cell in target_cells:
-		for cell in grid_manager.get_cells_in_tile_range(target_footprint_cell, get_attack_range_tile_count(), false):
-			if not blocked_cells.has(cell):
-				candidate_cells[cell] = true
-
-	var best_cell = grid_manager.find_nearest_reachable_cell_in_lookup(
-		grid_manager.world_to_cell(global_position),
-		candidate_cells,
-		blocked_cells
-	)
-
+func get_best_chase_tile_near_target(_grid_manager, target: Node2D) -> Vector2:
+	var best_cell = get_best_chase_cell_near_target(target)
 	if best_cell == Vector2i(-1, -1):
 		return grid_manager.snap_world_to_tile_center(global_position)
 
 	return grid_manager.cell_to_world(best_cell)
+
+func get_best_chase_cell_near_target(target: Node2D) -> Vector2i:
+	return get_best_attack_cell_near_target(target)
 
 func get_enemy_under_mouse() -> Node2D:
 	var mouse_pos = get_global_mouse_position()
@@ -390,29 +287,11 @@ func get_enemy_under_mouse() -> Node2D:
 func is_mouse_over_enemy_hitbox(enemy: Node2D, mouse_pos: Vector2) -> bool:
 	return HitboxMath.contains_point(enemy, mouse_pos)
 
-func is_attack_target_dead() -> bool:
-	if attack_target == null:
-		return true
-
-	var target_health = attack_target.get("current_health")
-
-	if target_health == null:
-		return false
-
-	return int(target_health) <= 0
-
-func should_show_attack_range() -> bool:
-	return is_selected and (
-		show_attack_range_debug or Input.is_key_pressed(KEY_SHIFT)
-	)
-
 func set_selected(selected: bool):
-	is_selected = selected
+	super.set_selected(selected)
 
 	if selection_circle != null:
 		selection_circle.visible = is_selected
-
-	queue_redraw()
 
 func is_managed_by_selection_manager() -> bool:
 	return get_tree().get_first_node_in_group("player_selection_manager") != null
@@ -427,8 +306,7 @@ func command_move_to_position(destination: Vector2) -> bool:
 	if not did_move:
 		return false
 
-	attack_target = null
-	is_chasing_attack_target = false
+	clear_current_attack_target(false)
 	chase_destination_cell = Vector2i(-1, -1)
 	clear_assigned_attack_slot()
 	return true
@@ -444,8 +322,6 @@ func command_attack_target(target: Node2D, should_chase: bool = true) -> bool:
 	if not accepted:
 		return false
 
-	attack_target = target
-	is_chasing_attack_target = should_chase
 	chase_destination_cell = Vector2i(-1, -1)
 	clear_assigned_attack_slot()
 	return true
@@ -473,46 +349,54 @@ func command_attack_move_to_position(destination: Vector2) -> bool:
 	if not did_move:
 		return false
 
-	attack_target = null
-	is_chasing_attack_target = false
+	clear_current_attack_target(false)
+	chase_destination_cell = Vector2i(-1, -1)
+	clear_assigned_attack_slot()
+	return true
+
+func command_group_move_along_path(path: Array[Vector2], final_destination: Vector2) -> bool:
+	var move_path: Array[Vector2] = []
+	var move_destination = final_destination
+
+	if grid_manager != null:
+		for path_position in path:
+			move_path.append(grid_manager.snap_world_to_tile_center(path_position))
+
+		move_destination = grid_manager.snap_world_to_tile_center(move_destination)
+	else:
+		move_path = path.duplicate()
+
+	var did_move = super.command_group_move_along_path(move_path, move_destination)
+	if not did_move:
+		return false
+
+	clear_current_attack_target(false)
 	chase_destination_cell = Vector2i(-1, -1)
 	clear_assigned_attack_slot()
 	return true
 
 func command_hold_position():
 	super.command_hold_position()
-	attack_target = null
-	is_chasing_attack_target = false
+	clear_current_attack_target(false)
 	chase_destination_cell = Vector2i(-1, -1)
 	clear_assigned_attack_slot()
 
 func command_stop():
 	super.command_stop()
-	attack_target = null
-	is_chasing_attack_target = false
+	clear_current_attack_target(false)
 	chase_destination_cell = Vector2i(-1, -1)
 	clear_assigned_attack_slot()
 
-func sync_attack_target_from_order():
-	if combat_orders == null:
-		return
-
-	var ordered_target = combat_orders.get_target()
-	if ordered_target == null or ordered_target == attack_target:
-		return
-
-	attack_target = ordered_target
-	clear_movement_ignore_nodes()
-	is_chasing_attack_target = combat_orders.allows_chase_target()
+func after_attack_target_changed(_target: Node2D):
 	chase_destination_cell = Vector2i(-1, -1)
 	clear_assigned_attack_slot()
 
-func clear_order_target_if_matching(target_to_clear: Node2D):
-	if combat_orders == null:
-		return
+func after_attack_target_cleared(_cleared_target: Node2D, was_chasing: bool):
+	if was_chasing and movement_component != null:
+		finish_interrupted_chase_to_tile()
 
-	if combat_orders.target == target_to_clear:
-		combat_orders.clear_target()
+	chase_destination_cell = Vector2i(-1, -1)
+	clear_assigned_attack_slot()
 
 func has_reached_assigned_attack_slot() -> bool:
 	if not has_assigned_attack_slot or grid_manager == null:

@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="CombatCounterRules" load_steps=24 format=3]
+[gd_resource type="Resource" script_class="CombatCounterRules" format=3 uid="uid://4gi04vwa5bve"]
 
-[ext_resource type="Script" path="res://scripts/data/combat_counter_rules.gd" id="1_rules"]
-[ext_resource type="Script" path="res://scripts/data/combat_counter_rule.gd" id="2_rule"]
+[ext_resource type="Script" uid="uid://cmdown0g48jpi" path="res://scripts/data/combat_counter_rules.gd" id="1_rules"]
+[ext_resource type="Script" uid="uid://dn4smkwjhlhe8" path="res://scripts/data/combat_counter_rule.gd" id="2_rule"]
 
 [sub_resource type="Resource" id="rule_infantry_vs_ranged"]
 script = ExtResource("2_rule")
-attacker_class = 0
 defender_class = 1
 multiplier = 1.3
 
@@ -24,13 +23,11 @@ multiplier = 1.3
 [sub_resource type="Resource" id="rule_cavalry_vs_infantry"]
 script = ExtResource("2_rule")
 attacker_class = 2
-defender_class = 0
 multiplier = 1.3
 
 [sub_resource type="Resource" id="rule_ranged_vs_infantry"]
 script = ExtResource("2_rule")
 attacker_class = 1
-defender_class = 0
 multiplier = 0.8
 
 [sub_resource type="Resource" id="rule_air_vs_ranged"]
@@ -47,13 +44,11 @@ multiplier = 0.8
 
 [sub_resource type="Resource" id="rule_infantry_vs_cavalry"]
 script = ExtResource("2_rule")
-attacker_class = 0
 defender_class = 2
 multiplier = 0.8
 
 [sub_resource type="Resource" id="rule_infantry_vs_siege"]
 script = ExtResource("2_rule")
-attacker_class = 0
 defender_class = 4
 multiplier = 1.2
 
@@ -78,7 +73,6 @@ multiplier = 1.2
 [sub_resource type="Resource" id="rule_siege_vs_infantry"]
 script = ExtResource("2_rule")
 attacker_class = 4
-defender_class = 0
 multiplier = 0.5
 
 [sub_resource type="Resource" id="rule_siege_vs_ranged"]
@@ -107,7 +101,6 @@ multiplier = 2.0
 
 [sub_resource type="Resource" id="rule_infantry_vs_building"]
 script = ExtResource("2_rule")
-attacker_class = 0
 defender_class = 6
 multiplier = 0.7
 
@@ -129,8 +122,80 @@ attacker_class = 3
 defender_class = 6
 multiplier = 0.7
 
+[sub_resource type="Resource" id="rule_champion_vs_infantry"]
+script = ExtResource("2_rule")
+attacker_class = 5
+multiplier = 2.0
+
+[sub_resource type="Resource" id="rule_champion_vs_ranged"]
+script = ExtResource("2_rule")
+attacker_class = 5
+defender_class = 1
+multiplier = 2.0
+
+[sub_resource type="Resource" id="rule_champion_vs_cavalry"]
+script = ExtResource("2_rule")
+attacker_class = 5
+defender_class = 2
+multiplier = 2.0
+
+[sub_resource type="Resource" id="rule_champion_vs_air"]
+script = ExtResource("2_rule")
+attacker_class = 5
+defender_class = 3
+multiplier = 2.0
+
+[sub_resource type="Resource" id="rule_champion_vs_siege"]
+script = ExtResource("2_rule")
+attacker_class = 5
+defender_class = 4
+multiplier = 2.0
+
+[sub_resource type="Resource" id="rule_champion_vs_champion"]
+script = ExtResource("2_rule")
+attacker_class = 5
+defender_class = 5
+
+[sub_resource type="Resource" id="rule_champion_vs_building"]
+script = ExtResource("2_rule")
+attacker_class = 5
+defender_class = 6
+
+[sub_resource type="Resource" id="rule_infantry_vs_champion"]
+script = ExtResource("2_rule")
+defender_class = 5
+multiplier = 0.5
+
+[sub_resource type="Resource" id="rule_ranged_vs_champion"]
+script = ExtResource("2_rule")
+attacker_class = 1
+defender_class = 5
+multiplier = 0.5
+
+[sub_resource type="Resource" id="rule_cavalry_vs_champion"]
+script = ExtResource("2_rule")
+attacker_class = 2
+defender_class = 5
+multiplier = 0.5
+
+[sub_resource type="Resource" id="rule_air_vs_champion"]
+script = ExtResource("2_rule")
+attacker_class = 3
+defender_class = 5
+multiplier = 0.5
+
+[sub_resource type="Resource" id="rule_siege_vs_champion"]
+script = ExtResource("2_rule")
+attacker_class = 4
+defender_class = 5
+multiplier = 0.5
+
+[sub_resource type="Resource" id="rule_building_vs_champion"]
+script = ExtResource("2_rule")
+attacker_class = 6
+defender_class = 5
+multiplier = 0.5
+
 [resource]
 script = ExtResource("1_rules")
-default_multiplier = 1.0
-champion_default_multiplier = 1.0
-rules = Array[Resource]([SubResource("rule_infantry_vs_ranged"), SubResource("rule_ranged_vs_air"), SubResource("rule_air_vs_cavalry"), SubResource("rule_cavalry_vs_infantry"), SubResource("rule_ranged_vs_infantry"), SubResource("rule_air_vs_ranged"), SubResource("rule_cavalry_vs_air"), SubResource("rule_infantry_vs_cavalry"), SubResource("rule_infantry_vs_siege"), SubResource("rule_ranged_vs_siege"), SubResource("rule_cavalry_vs_siege"), SubResource("rule_air_vs_siege"), SubResource("rule_siege_vs_infantry"), SubResource("rule_siege_vs_ranged"), SubResource("rule_siege_vs_cavalry"), SubResource("rule_siege_vs_air"), SubResource("rule_siege_vs_building"), SubResource("rule_infantry_vs_building"), SubResource("rule_ranged_vs_building"), SubResource("rule_cavalry_vs_building"), SubResource("rule_air_vs_building")])
+rules = Array[ExtResource("2_rule")]([SubResource("rule_infantry_vs_ranged"), SubResource("rule_ranged_vs_air"), SubResource("rule_air_vs_cavalry"), SubResource("rule_cavalry_vs_infantry"), SubResource("rule_ranged_vs_infantry"), SubResource("rule_air_vs_ranged"), SubResource("rule_cavalry_vs_air"), SubResource("rule_infantry_vs_cavalry"), SubResource("rule_infantry_vs_siege"), SubResource("rule_ranged_vs_siege"), SubResource("rule_cavalry_vs_siege"), SubResource("rule_air_vs_siege"), SubResource("rule_siege_vs_infantry"), SubResource("rule_siege_vs_ranged"), SubResource("rule_siege_vs_cavalry"), SubResource("rule_siege_vs_air"), SubResource("rule_siege_vs_building"), SubResource("rule_infantry_vs_building"), SubResource("rule_ranged_vs_building"), SubResource("rule_cavalry_vs_building"), SubResource("rule_air_vs_building"), SubResource("rule_champion_vs_infantry"), SubResource("rule_champion_vs_ranged"), SubResource("rule_champion_vs_cavalry"), SubResource("rule_champion_vs_air"), SubResource("rule_champion_vs_siege"), SubResource("rule_champion_vs_champion"), SubResource("rule_champion_vs_building"), SubResource("rule_infantry_vs_champion"), SubResource("rule_ranged_vs_champion"), SubResource("rule_cavalry_vs_champion"), SubResource("rule_air_vs_champion"), SubResource("rule_siege_vs_champion"), SubResource("rule_building_vs_champion")])

@@ -23,7 +23,7 @@ func get_multiplier_for_nodes(attacker: Node, defender: Node) -> float:
 		get_combat_class_for_node(attacker),
 		get_combat_class_for_node(defender)
 	)
-
+	
 func get_multiplier(attacker_class: int, defender_class: int) -> float:
 	_rebuild_lookup_if_needed()
 
@@ -31,9 +31,6 @@ func get_multiplier(attacker_class: int, defender_class: int) -> float:
 
 	if _rule_lookup.has(key):
 		return _rule_lookup[key]
-
-	if attacker_class == CombatClass.CHAMPION or defender_class == CombatClass.CHAMPION:
-		return champion_default_multiplier
 
 	return default_multiplier
 

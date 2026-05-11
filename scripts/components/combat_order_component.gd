@@ -10,7 +10,7 @@ enum OrderType {
 	ATTACK_MOVE,
 	DEFEND_AREA,
 	HOLD_POSITION,
-	FLEE
+	HARVEST
 }
 
 enum Stance {
@@ -71,6 +71,13 @@ func set_attack_move_order(new_destination: Vector2):
 	chase_target = true
 	order_changed.emit(order_type, stance)
 
+func set_harvest_order(resource_node: Node2D):
+	order_type = OrderType.HARVEST
+	target = resource_node
+	has_destination = false
+	chase_target = false
+	order_changed.emit(order_type, stance)
+
 func set_defend_area_order(new_anchor_position: Vector2, radius_tiles: int = -1):
 	order_type = OrderType.DEFEND_AREA
 	target = null
@@ -90,14 +97,6 @@ func set_hold_position_order(new_anchor_position: Vector2):
 	anchor_position = new_anchor_position
 	has_anchor_position = true
 	has_destination = false
-	chase_target = false
-	order_changed.emit(order_type, stance)
-
-func set_flee_order(new_destination: Vector2):
-	order_type = OrderType.FLEE
-	target = null
-	destination = new_destination
-	has_destination = true
 	chase_target = false
 	order_changed.emit(order_type, stance)
 
@@ -125,9 +124,6 @@ func complete_current_order():
 	if order_type == OrderType.MOVE:
 		set_idle_order()
 		return
-
-	if order_type == OrderType.FLEE:
-		set_idle_order()
 
 func allows_auto_acquire() -> bool:
 	if stance == Stance.PASSIVE:
@@ -190,8 +186,8 @@ func get_order_name() -> String:
 			return "Defend Area"
 		OrderType.HOLD_POSITION:
 			return "Hold Position"
-		OrderType.FLEE:
-			return "Flee"
+		OrderType.HARVEST:
+			return "Harvest"
 		_:
 			return "Unknown"
 

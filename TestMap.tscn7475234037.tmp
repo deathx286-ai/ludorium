@@ -1,0 +1,232 @@
+[gd_scene format=3 uid="uid://b0jp8l15jk8a7"]
+
+[ext_resource type="PackedScene" uid="uid://ct2xjaw1re4sn" path="res://scenes/units/Soldier.tscn" id="1_soldier"]
+[ext_resource type="PackedScene" path="res://scenes/Buildings/BaseBuilding.tscn" id="2_base_building"]
+[ext_resource type="Script" uid="uid://cmf508mr3cq0y" path="res://scripts/systems/player_manager.gd" id="3_xxdj2"]
+[ext_resource type="Script" uid="uid://u4l5732250wo" path="res://scripts/systems/run_manager.gd" id="4_hvnfr"]
+[ext_resource type="Script" uid="uid://dyhyt6cqjn2pg" path="res://scripts/systems/upgrade_manager.gd" id="5_1y0um"]
+[ext_resource type="Script" uid="uid://ckmgyrpcndspl" path="res://scripts/systems/world_manager.gd" id="6_4ykif"]
+[ext_resource type="Script" uid="uid://b8u8c63ympwne" path="res://scripts/systems/godmanager.gd" id="7_43vq4"]
+[ext_resource type="Script" uid="uid://bix446cn8vu6v" path="res://scripts/systems/camera_controller.gd" id="8_1y0um"]
+[ext_resource type="Script" uid="uid://be8jd068xwsbj" path="res://scripts/systems/grid_occupancy_manager.gd" id="8_43vq4"]
+[ext_resource type="Script" uid="uid://b4ka1su6px8hw" path="res://scripts/systems/run_diplomacy_manager.gd" id="9_4l0jn"]
+[ext_resource type="Script" uid="uid://b22e75jvqh2li" path="res://scripts/systems/grid_manager.gd" id="9_4ykif"]
+[ext_resource type="Resource" uid="uid://8t4ral46qcax" path="res://data/nations/EmberholdData.tres" id="10_27pcn"]
+[ext_resource type="Script" uid="uid://cp56bck561dib" path="res://scripts/systems/unit_spawner.gd" id="11_2o5ho"]
+[ext_resource type="PackedScene" uid="uid://nu0dshosmsk6" path="res://scenes/units/BaseUnit.tscn" id="12_defeh"]
+[ext_resource type="Script" uid="uid://dtr48ki0bdnfp" path="res://scripts/systems/building_spawner.gd" id="13_wvj8d"]
+[ext_resource type="Script" uid="uid://dhe7fhtta81bo" path="res://scripts/systems/placement_manager.gd" id="14_place"]
+[ext_resource type="Resource" uid="uid://b3p3xh03kip5x" path="res://data/nations/VeridionData.tres" id="15_veridion"]
+[ext_resource type="Resource" uid="uid://i6rc5tf6j05v" path="res://data/nations/GrimburrowData.tres" id="16_grimburrow"]
+[ext_resource type="PackedScene" uid="uid://csn1jjtmwi7d8" path="res://scenes/units/EnemyUnit.tscn" id="17_enemy_unit"]
+[ext_resource type="PackedScene" path="res://scenes/units/AllyUnit.tscn" id="18_ally"]
+[ext_resource type="Script" uid="uid://d0qc3xiajo1wh" path="res://scripts/systems/diplomacy_debugger.gd" id="19_diplomacy_debugger"]
+[ext_resource type="Script" uid="uid://cfbxdtovubmxt" path="res://scripts/systems/resources_debugger.gd" id="20_resources_debugger"]
+[ext_resource type="Script" uid="uid://derr5uae6rxmn" path="res://scripts/systems/debug_manager.gd" id="21_debug_manager"]
+[ext_resource type="Script" uid="uid://pjn7w05n50js" path="res://scripts/systems/combat_debugger.gd" id="22_combat_debugger"]
+[ext_resource type="PackedScene" uid="uid://b63h160hs8uyu" path="res://scenes/Buildings/UnitSpawnerBuilding.tscn" id="23_unit_spawner_building"]
+[ext_resource type="Script" uid="uid://e0xlyv4ocijw" path="res://scripts/systems/player_unit_selection_manager.gd" id="24_selection_manager"]
+[ext_resource type="Theme" uid="uid://b8r0vyl7dna0k" path="res://data/ui/fantasy_theme.tres" id="27_5pyk2"]
+[ext_resource type="Script" uid="uid://bqunr1y5w2bub" path="res://scripts/ui/combat_ui_panel.gd" id="27_y6lxb"]
+
+[node name="TestMap" type="Node2D" unique_id=26370686]
+
+[node name="Systems" type="Node" parent="." unique_id=677645085]
+
+[node name="PlayerManager" type="Node" parent="Systems" unique_id=947849164 groups=["player_manager"]]
+script = ExtResource("3_xxdj2")
+
+[node name="RunManager" type="Node" parent="Systems" unique_id=1635813507 groups=["run_manager"]]
+script = ExtResource("4_hvnfr")
+
+[node name="UpgradeManager" type="Node" parent="Systems" unique_id=1193256795 groups=["upgrade_manager"]]
+script = ExtResource("5_1y0um")
+
+[node name="WorldManager" type="Node" parent="Systems" unique_id=1809030109 groups=["world_manager"]]
+script = ExtResource("6_4ykif")
+
+[node name="GodManager" type="Node" parent="Systems" unique_id=942011978 groups=["god_manager"]]
+script = ExtResource("7_43vq4")
+
+[node name="GridOccupancyManager" type="Node" parent="Systems" unique_id=1989092087 groups=["grid_occupancy_manager"]]
+script = ExtResource("8_43vq4")
+
+[node name="RunDiplomacyManager" type="Node" parent="Systems" unique_id=1858433191]
+script = ExtResource("9_4l0jn")
+known_nations = Array[Resource]([ExtResource("10_27pcn"), ExtResource("15_veridion"), ExtResource("16_grimburrow")])
+selected_player_nation = ExtResource("10_27pcn")
+
+[node name="UnitSpawner" type="Node" parent="Systems" unique_id=114865324 node_paths=PackedStringArray("spawn_parent", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager")]
+script = ExtResource("11_2o5ho")
+base_unit_scene = ExtResource("12_defeh")
+player_unit_scene = ExtResource("1_soldier")
+ally_unit_scene = ExtResource("18_ally")
+enemy_unit_scene = ExtResource("17_enemy_unit")
+spawn_parent = NodePath("../..")
+run_diplomacy_manager = NodePath("../RunDiplomacyManager")
+grid_manager = NodePath("../../GridManager")
+grid_occupancy_manager = NodePath("../GridOccupancyManager")
+metadata/_custom_type_script = "uid://cp56bck561dib"
+
+[node name="BuildingSpawner" type="Node" parent="Systems" unique_id=1838385739 node_paths=PackedStringArray("spawn_parent", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager")]
+script = ExtResource("13_wvj8d")
+base_building_scene = ExtResource("2_base_building")
+unit_spawner_building_scene = ExtResource("23_unit_spawner_building")
+spawn_parent = NodePath("../..")
+run_diplomacy_manager = NodePath("../RunDiplomacyManager")
+grid_manager = NodePath("../../GridManager")
+grid_occupancy_manager = NodePath("../GridOccupancyManager")
+metadata/_custom_type_script = "uid://dtr48ki0bdnfp"
+
+[node name="PlacementManager" type="Node" parent="Systems" unique_id=2121334467 node_paths=PackedStringArray("unit_spawner", "building_spawner", "run_diplomacy_manager", "grid_manager", "grid_occupancy_manager")]
+script = ExtResource("14_place")
+nation_options = Array[Resource]([ExtResource("10_27pcn"), ExtResource("15_veridion"), ExtResource("16_grimburrow")])
+unit_spawner = NodePath("../UnitSpawner")
+building_spawner = NodePath("../BuildingSpawner")
+run_diplomacy_manager = NodePath("../RunDiplomacyManager")
+grid_manager = NodePath("../../GridManager")
+grid_occupancy_manager = NodePath("../GridOccupancyManager")
+
+[node name="DiplomacyDebugger" type="Node" parent="Systems" unique_id=676754155 node_paths=PackedStringArray("run_diplomacy_manager")]
+script = ExtResource("19_diplomacy_debugger")
+run_diplomacy_manager = NodePath("../RunDiplomacyManager")
+
+[node name="ResourcesDebugger" type="Node" parent="Systems" unique_id=180912369 node_paths=PackedStringArray("player_manager", "resource_scan_root") groups=["hud_resource_provider", "resources_debugger"]]
+script = ExtResource("20_resources_debugger")
+player_manager = NodePath("../PlayerManager")
+resource_scan_root = NodePath("../..")
+
+[node name="CombatDebugger" type="Node" parent="Systems" unique_id=1160733700]
+script = ExtResource("22_combat_debugger")
+
+[node name="DebugManager" type="Node" parent="Systems" unique_id=1575994728 node_paths=PackedStringArray("placement_manager", "diplomacy_debugger", "resources_debugger", "combat_debugger", "status_label")]
+script = ExtResource("21_debug_manager")
+placement_manager = NodePath("../PlacementManager")
+diplomacy_debugger = NodePath("../DiplomacyDebugger")
+resources_debugger = NodePath("../ResourcesDebugger")
+combat_debugger = NodePath("../CombatDebugger")
+status_label = NodePath("../../PlacementUI/DebugStatusLabel")
+
+[node name="PlayerSelectionManager" type="Node2D" parent="." unique_id=294147230 node_paths=PackedStringArray("placement_manager", "grid_manager")]
+script = ExtResource("24_selection_manager")
+placement_manager = NodePath("../Systems/PlacementManager")
+grid_manager = NodePath("../GridManager")
+click_drag_threshold = null
+drag_fill_color = null
+drag_outline_color = null
+defend_radius_tiles = null
+
+[node name="MainCamera" type="Camera2D" parent="." unique_id=555430404]
+position = Vector2(640, 360)
+limit_left = -1422
+limit_top = -1359
+limit_right = 1778
+limit_bottom = 881
+script = ExtResource("8_1y0um")
+
+[node name="GridManager" type="Node2D" parent="." unique_id=2076019186 groups=["grid_manager"]]
+script = ExtResource("9_4ykif")
+
+[node name="PlacementUI" type="CanvasLayer" parent="." unique_id=170445265]
+
+[node name="DebugStatusLabel" type="Label" parent="PlacementUI" unique_id=1462033137]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 1260.0
+offset_bottom = 92.0
+text = "Debug loading..."
+autowrap_mode = 2
+
+[node name="CombatUIPanel" type="PanelContainer" parent="PlacementUI" unique_id=1109496177]
+custom_minimum_size = Vector2(200, 0)
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = -249.0
+offset_right = 205.0
+offset_bottom = -1.0
+grow_vertical = 0
+theme = ExtResource("27_5pyk2")
+script = ExtResource("27_y6lxb")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlacementUI/CombatUIPanel" unique_id=1661877088]
+layout_mode = 2
+
+[node name="MainHBox" type="HBoxContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer" unique_id=1495767783]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitFrame" type="PanelContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox" unique_id=867208873]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+
+[node name="UnitPortrait" type="TextureRect" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/PortraitFrame" unique_id=1718057746]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox" unique_id=1738296317]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="UnitNameLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1604251046]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54509807, 0.27058825, 0.07450981, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="ArchetypeLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1024150109]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Class: N/A"
+
+[node name="@HSeparator@37796" type="HSeparator" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=104547445]
+layout_mode = 2
+
+[node name="StatsGrid" type="GridContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1135695940]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid" unique_id=1188027388]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=1705732680]
+unique_name_in_owner = true
+layout_mode = 2
+text = "✙ Health (Current/Max): 0/0"
+
+[node name="DamageLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=1810017412]
+unique_name_in_owner = true
+layout_mode = 2
+text = "⚔ Damage (DPS): 0 (0.0)"
+
+[node name="RangeLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=366790162]
+unique_name_in_owner = true
+layout_mode = 2
+text = "➵ Range (Tiles): 0"
+
+[node name="SpeedLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=552909189]
+unique_name_in_owner = true
+layout_mode = 2
+text = "⚡ Atk Speed (Attacks/s): 0.0"
+
+[node name="MoveSpeedLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer/StatsGrid/GridContainer" unique_id=358507763]
+unique_name_in_owner = true
+layout_mode = 2
+text = "👣 Movement (Units/s): 0"
+
+[node name="@HSeparator@37801" type="HSeparator" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=619811302]
+layout_mode = 2
+
+[node name="OrderLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=1295804176]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Order: Idle"
+
+[node name="TargetLabel" type="Label" parent="PlacementUI/CombatUIPanel/VBoxContainer/MainHBox/VBoxContainer" unique_id=908037544]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Target: None"

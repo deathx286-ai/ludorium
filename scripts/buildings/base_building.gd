@@ -7,6 +7,8 @@ class_name BaseBuilding
 		building_data = value
 		apply_building_data()
 
+@export var target_scan_interval: float = 0.25
+
 @export var fallback_tile_size: int = 64:
 	set(value):
 		fallback_tile_size = max(value, 1)
@@ -23,6 +25,7 @@ var attack_cooldown: float = 1.0
 var xp_reward: int = 0
 var gold_reward: int = 0
 var attack_timer: float = 0.0
+var target_scan_timer: float = 0.0
 var attack_target: Node2D = null
 var is_destroyed: bool = false
 
@@ -40,6 +43,7 @@ func _ready():
 		return
 
 	current_health = max_health
+	target_scan_timer = randf() * target_scan_interval
 	setup_health_bar()
 	update_process_mode()
 
@@ -52,15 +56,18 @@ func _ready():
 		occupancy_manager.register_node(self)
 
 func _process(delta: float):
-	if Engine.is_editor_hint() or is_destroyed or not can_attack:
+	if Engine.is_editor_hint() or is_destroyed or not should_auto_attack():
 		return
 
 	attack_timer -= delta
+	target_scan_timer -= delta
 
 	if attack_target != null and not is_valid_attack_target(attack_target):
 		attack_target = null
+		target_scan_timer = 0.0
 
-	if attack_target == null:
+	if attack_target == null and target_scan_timer <= 0.0:
+		target_scan_timer = target_scan_interval
 		attack_target = find_attack_target()
 
 	if attack_target == null:
@@ -109,6 +116,7 @@ func apply_building_data():
 
 	update_classification_label()
 	_update_sizes()
+	_spawn_subtype_indicator()
 	setup_health_bar()
 	update_process_mode()
 
@@ -116,7 +124,7 @@ func update_process_mode():
 	if not is_inside_tree():
 		return
 
-	set_process(not Engine.is_editor_hint() and can_attack)
+	set_process(not Engine.is_editor_hint() and should_auto_attack())
 
 func setup_health_bar():
 	if health_bar == null:
@@ -129,6 +137,9 @@ func setup_health_bar():
 
 func take_damage(amount: int):
 	if is_destroyed:
+		return
+
+	if has_method("can_take_combat_damage") and not can_take_combat_damage():
 		return
 
 	current_health = maxi(current_health - amount, 0)
@@ -145,6 +156,10 @@ func die():
 	var occupancy_manager = get_tree().get_first_node_in_group("grid_occupancy_manager")
 	if occupancy_manager != null:
 		occupancy_manager.unregister_node(self)
+
+	var road_supply_manager = get_tree().get_first_node_in_group("road_supply_manager")
+	if road_supply_manager != null and road_supply_manager.has_method("unregister_building"):
+		road_supply_manager.unregister_building(self)
 
 	if is_enemy_target_for_rewards():
 		var player_manager = get_tree().get_first_node_in_group("player_manager")
@@ -170,6 +185,9 @@ func get_tile_size() -> int:
 
 func get_tile_footprint_size() -> Vector2i:
 	return Vector2i(footprint_width, footprint_height)
+
+func can_take_combat_damage() -> bool:
+	return true
 
 func get_hitbox() -> Area2D:
 	return get_node_or_null("Hitbox")
@@ -204,6 +222,15 @@ func find_attack_target() -> Node2D:
 
 	return closest_target
 
+func should_auto_attack() -> bool:
+	if not can_attack or attack_damage <= 0 or attack_range_tiles <= 0:
+		return false
+
+	if building_data == null:
+		return false
+
+	return bool(building_data.get("is_defense_building"))
+
 func is_valid_attack_target(candidate: Node) -> bool:
 	if candidate == null or candidate == self or not is_instance_valid(candidate):
 		return false
@@ -212,6 +239,9 @@ func is_valid_attack_target(candidate: Node) -> bool:
 		return false
 
 	if not candidate.has_method("take_damage"):
+		return false
+
+	if candidate.has_method("can_take_combat_damage") and not bool(candidate.call("can_take_combat_damage")):
 		return false
 
 	var target_health = candidate.get("current_health")
@@ -330,3 +360,18 @@ func _update_sizes():
 
 func apply_nation_visuals():
 	NationVisuals.apply_owner_or_data_to_node(self, building_data)
+
+func _spawn_subtype_indicator():
+	if Engine.is_editor_hint():
+		return
+
+	var indicator_scene = preload("res://scenes/ui/subtype_indicator.tscn")
+	var indicator = get_node_or_null("SubtypeIndicator")
+	if indicator == null:
+		indicator = indicator_scene.instantiate()
+		indicator.name = "SubtypeIndicator"
+		add_child(indicator)
+
+	indicator.z_index = 2
+	if indicator.has_method("setup"):
+		indicator.setup(building_data, Vector2i(footprint_width, footprint_height))

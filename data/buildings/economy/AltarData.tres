@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "altar"
+display_name = "Altar"
+description = "Trains Champions."
+max_health = 360
+footprint_width = 2
+footprint_height = 2
+movement_type = 4
+unit_domain = 6
+unit_archetype = 18
+unit_role = 62
+building_kind = 8
+gold_cost = 120
+stone_cost = 140
+metal_cost = 80
+is_production_building = true
+building_tags = ["altar", "production_structure", "champion"]

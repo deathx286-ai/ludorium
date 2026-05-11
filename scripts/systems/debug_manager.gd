@@ -7,7 +7,10 @@ class_name DebugManager
 @export var diplomacy_debugger: Node
 @export var resources_debugger: Node
 @export var combat_debugger: Node
+@export var economy_debugger: Node
+@export var debug_panel: Node
 @export var status_label: Label
+@export var show_status_bar: bool = true
 
 var debug_tabs: Array[Node] = []
 var _refresh_timer: float = 0.0
@@ -15,7 +18,7 @@ var _refresh_timer: float = 0.0
 func _ready():
 	debug_tabs.clear()
 
-	for tab in [placement_manager, diplomacy_debugger, resources_debugger, combat_debugger]:
+	for tab in [placement_manager, diplomacy_debugger, resources_debugger, combat_debugger, economy_debugger]:
 		if tab != null:
 			debug_tabs.append(tab)
 
@@ -54,6 +57,22 @@ func _unhandled_input(event):
 		get_viewport().set_input_as_handled()
 		return
 
+	# Global placement toggle
+	if event.keycode == KEY_P:
+		var handled = false
+		if placement_manager != null and placement_manager.has_method("toggle_placement_enabled"):
+			placement_manager.call("toggle_placement_enabled")
+			handled = true
+		
+		# Also cancel any specialized placements to ensure we truly return to gameplay
+		if economy_debugger != null and economy_debugger.has_method("cancel_pending_resource_node_placement"):
+			economy_debugger.call("cancel_pending_resource_node_placement")
+		
+		if handled:
+			_update_status_label()
+			get_viewport().set_input_as_handled()
+			return
+
 	var active_tab = get_active_tab()
 	if active_tab != null and active_tab.has_method("handle_debug_input"):
 		if bool(active_tab.call("handle_debug_input", event)):
@@ -83,17 +102,20 @@ func _apply_active_tab():
 			tab.call("set_debug_active", debug_visible and index == active_tab_index)
 
 	if status_label != null:
-		status_label.visible = debug_visible
+		status_label.visible = false
+
+	if debug_panel != null and debug_panel.has_method("set_debug_visible"):
+		debug_panel.call("set_debug_visible", debug_visible)
 
 func _update_status_label():
 	if status_label == null:
 		return
 
-	status_label.visible = debug_visible
-
-	if not debug_visible:
+	if not show_status_bar or not debug_visible:
+		status_label.visible = false
 		return
 
+	status_label.visible = true
 	var active_tab = get_active_tab()
 
 	if active_tab == null:
@@ -101,5 +123,10 @@ func _update_status_label():
 		return
 
 	var title = str(active_tab.call("get_debug_title")) if active_tab.has_method("get_debug_title") else active_tab.name
-	var text = str(active_tab.call("get_debug_text")) if active_tab.has_method("get_debug_text") else ""
-	status_label.text = "DEBUG [%s] | %s | F1 hide, Tab switch" % [title, text]
+	var text = ""
+	if active_tab.has_method("get_current_debug_summary"):
+		text = str(active_tab.call("get_current_debug_summary"))
+	elif active_tab.has_method("get_debug_text"):
+		text = str(active_tab.call("get_debug_text"))
+
+	status_label.text = "DEBUG: %s | F1 hide/show | Tab switch" % text

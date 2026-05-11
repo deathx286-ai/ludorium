@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "capital"
+display_name = "Capital"
+description = "Primary economy and supply anchor."
+max_health = 1200
+footprint_width = 3
+footprint_height = 3
+movement_type = 4
+unit_domain = 6
+unit_archetype = 18
+unit_role = 62
+building_kind = 1
+wood_cost = 500
+food_cost = 250
+gold_cost = 250
+stone_cost = 250
+metal_cost = 150
+supply_radius_tiles = 12
+building_tags = ["capital", "supply_anchor", "economy"]

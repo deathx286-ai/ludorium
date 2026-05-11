@@ -134,6 +134,29 @@ func get_debug_text() -> String:
 		_get_selected_pair_summary()
 	]
 
+func get_current_debug_summary() -> String:
+	if run_diplomacy_manager == null:
+		return "Diplomacy | Not connected"
+
+	return "Diplomacy | %s | %s" % [
+		_get_display_name(run_diplomacy_manager.get("selected_player_nation")),
+		_get_selected_pair_summary()
+	]
+
+func get_debug_state() -> Dictionary:
+	return {
+		"selected_player_nation": _get_display_name(run_diplomacy_manager.get("selected_player_nation")) if run_diplomacy_manager != null else "Not connected",
+		"selected_pair": _get_selected_pair_summary(),
+		"relationship_summary": run_diplomacy_manager.get_relationship_summary() if run_diplomacy_manager != null and run_diplomacy_manager.has_method("get_relationship_summary") else "",
+		"pairwise_summary": run_diplomacy_manager.get_pairwise_relationship_summary() if run_diplomacy_manager != null and run_diplomacy_manager.has_method("get_pairwise_relationship_summary") else ""
+	}
+
+func get_debug_shortcuts() -> Array:
+	return [
+		{"keys": "Q/E", "description": "Cycle diplomacy pair"},
+		{"keys": "Space", "description": "Cycle selected relationship"}
+	]
+
 func _get_selected_pair() -> Array:
 	if _pair_cache.is_empty():
 		_refresh_pair_cache()

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "watch_tower"
+display_name = "Watch Tower"
+description = "Static defense building."
+max_health = 260
+footprint_width = 1
+footprint_height = 1
+movement_type = 4
+unit_domain = 6
+unit_archetype = 19
+unit_role = 57
+building_kind = 10
+wood_cost = 40
+stone_cost = 120
+is_defense_building = true
+can_attack = true
+damage = 12
+attack_range_tiles = 5
+attack_cooldown = 1.4
+building_tags = ["watch_tower", "defense_structure", "tower"]

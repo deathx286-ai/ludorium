@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_unit_data"]
+
+[resource]
+script = ExtResource("1_unit_data")
+unit_id = "general_worker"
+display_name = "General Worker"
+description = "Prototype worker used for harvesting and economy debugging."
+max_health = 60
+damage = 1
+attack_range_tiles = 1
+attack_cooldown = 1.5
+move_speed = 145.0
+vision_range_tiles = 5
+footprint_width = 1
+footprint_height = 1
+movement_type = 0
+unit_domain = 0
+unit_archetype = 2
+unit_role = 6
+can_move = true
+can_attack = false
+is_structure = false
+can_harvest = true
+worker_type = 4
+unit_tags = ["worker", "economy", "debug"]

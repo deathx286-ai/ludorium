@@ -33,6 +33,19 @@ enum ResourceType {
 @export var resource_amount_per_tick: int = 0
 @export var resource_tick_seconds: float = 3.0
 
+@export_group("Economy / Placement")
+@export var building_kind: EconomyTypes.BuildingKind = EconomyTypes.BuildingKind.AUTO
+@export var resource_cost: Dictionary = {}
+@export var wood_cost: int = 0
+@export var food_cost: int = 0
+@export var gold_cost: int = 0
+@export var stone_cost: int = 0
+@export var metal_cost: int = 0
+@export var supply_radius_tiles: int = 12
+@export var outpost_network_range_tiles: int = 50
+@export var minimum_anchor_distance_tiles: int = 25
+@export var population_capacity_bonus: int = 0
+
 @export_group("Flags")
 @export var is_resource_building: bool = false
 @export var is_production_building: bool = false

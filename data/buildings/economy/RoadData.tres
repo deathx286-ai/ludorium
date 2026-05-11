@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "road"
+display_name = "Road"
+description = "Connected infrastructure tile."
+max_health = 150
+footprint_width = 1
+footprint_height = 1
+movement_type = 4
+unit_domain = 6
+unit_archetype = 18
+unit_role = 62
+building_kind = 2
+wood_cost = 5
+stone_cost = 5
+building_tags = ["road", "infrastructure"]

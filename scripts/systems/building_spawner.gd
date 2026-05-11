@@ -7,6 +7,7 @@ class_name BuildingSpawner
 @export var run_diplomacy_manager: Node
 @export var grid_manager: Node
 @export var grid_occupancy_manager: Node
+@export var road_supply_manager: Node
 
 func spawn_building(building_data: Resource, owner_nation: Resource, cell: Vector2i, auto_spawn_enabled: bool = false, allegiance_override: int = 0) -> Node2D:
 	if building_data == null:
@@ -37,6 +38,7 @@ func spawn_building(building_data: Resource, owner_nation: Resource, cell: Vecto
 	_assign_allegiance_groups(building)
 	_add_spawned_node(building)
 	_register_occupancy(building)
+	_register_road_supply(building, building_data, owner_nation)
 
 	return building
 
@@ -121,6 +123,15 @@ func _register_occupancy(building: Node):
 		return
 
 	grid_occupancy_manager.register_node(building)
+
+func _register_road_supply(building: Node2D, building_data: Resource, owner_nation: Resource):
+	if road_supply_manager == null or not is_instance_valid(road_supply_manager):
+		road_supply_manager = get_tree().get_first_node_in_group("road_supply_manager")
+
+	if road_supply_manager == null or not road_supply_manager.has_method("register_building"):
+		return
+
+	road_supply_manager.register_building(building, building_data, owner_nation)
 
 func _has_property(object: Object, property_name: String) -> bool:
 	if object == null:

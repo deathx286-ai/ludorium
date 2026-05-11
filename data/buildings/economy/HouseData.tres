@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "house"
+display_name = "House"
+description = "Basic population support building."
+max_health = 180
+footprint_width = 2
+footprint_height = 2
+movement_type = 4
+unit_domain = 6
+unit_archetype = 18
+unit_role = 62
+building_kind = 3
+wood_cost = 40
+population_capacity_bonus = 5
+building_tags = ["house", "support"]

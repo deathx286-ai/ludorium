@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building_data"]
+
+[resource]
+script = ExtResource("1_building_data")
+building_id = "wall"
+display_name = "Wall"
+description = "Defensive blocker."
+max_health = 400
+footprint_width = 1
+footprint_height = 1
+movement_type = 4
+unit_domain = 6
+unit_archetype = 19
+unit_role = 58
+building_kind = 11
+stone_cost = 20
+is_defense_building = true
+is_wall = true
+building_tags = ["wall", "defense_structure"]

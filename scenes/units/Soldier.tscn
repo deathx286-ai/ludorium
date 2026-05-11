@@ -18,7 +18,6 @@ radius = 11.2
 size = Vector2(64, 64)
 
 [node name="Soldier" type="CharacterBody2D" unique_id=666106218 groups=["player"]]
-position = Vector2(32, 0)
 script = ExtResource("1_eu5ba")
 unit_data = ExtResource("4_soldier_data")
 show_attack_range_debug = false
