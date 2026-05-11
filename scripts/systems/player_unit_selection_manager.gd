@@ -1,8 +1,5 @@
 extends Node2D
-# z_index set in _ready()
 class_name PlayerUnitSelectionManager
-
-signal selection_changed(units: Array[Node2D])
 
 @export var placement_manager: Node
 @export var grid_manager: Node
@@ -23,22 +20,13 @@ var attack_move_armed: bool = false
 func _ready():
 	add_to_group("player_selection_manager")
 	ensure_unit_commander()
-	self.z_index = 200
-
-func _process(_delta):
-	# Redraw target indicators if any selected unit has a target
-	if not selected_units.is_empty():
-		for unit in selected_units:
-			if is_instance_valid(unit) and is_instance_valid(unit.get("attack_target")):
-				queue_redraw()
-				return
 
 func _unhandled_input(event):
 	if not is_selection_input_enabled():
 		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
-		handle_key_command(event)
+		handle_key_command(event)tes
 		return
 
 	if event is InputEventMouseButton:
@@ -51,11 +39,6 @@ func _unhandled_input(event):
 		queue_redraw()
 
 func _draw():
-	# Draw target indicators for selected units
-	for unit in selected_units:
-		if is_instance_valid(unit) and is_instance_valid(unit.get("attack_target")):
-			draw_target_indicator(unit.get("attack_target"))
-
 	if not is_dragging:
 		return
 
@@ -69,16 +52,6 @@ func _draw():
 
 	draw_rect(drag_rect, drag_fill_color, true)
 	draw_rect(drag_rect, drag_outline_color, false, 2.0)
-
-func draw_target_indicator(target: Node2D):
-	if not is_instance_valid(target):
-		return
-
-	var target_local_pos = to_local(target.global_position)
-	var size = 30.0
-	draw_arc(target_local_pos, size, 0, TAU, 16, Color(1.0, 0.1, 0.1, 0.7), 2.0)
-	draw_line(target_local_pos + Vector2(-size, 0), target_local_pos + Vector2(size, 0), Color(1.0, 0.1, 0.1, 0.7), 1.5)
-	draw_line(target_local_pos + Vector2(0, -size), target_local_pos + Vector2(0, size), Color(1.0, 0.1, 0.1, 0.7), 1.5)
 
 func handle_mouse_button(event: InputEventMouseButton):
 	if event.button_index == MOUSE_BUTTON_LEFT:
@@ -173,12 +146,6 @@ func issue_context_command(screen_position: Vector2):
 
 	prune_invalid_selection()
 
-	var resource_node = get_resource_node_under_screen_position(screen_position)
-	if resource_node != null:
-		harvest_selected_units(resource_node)
-		attack_move_armed = false
-		return
-
 	var hostile_target = get_hostile_target_under_screen_position(screen_position)
 	if hostile_target != null:
 		attack_selected_units(hostile_target)
@@ -211,13 +178,6 @@ func attack_move_selected_units(destination: Vector2):
 	ensure_unit_commander()
 	unit_commander.command_attack_move_units(selected_units, destination)
 
-func harvest_selected_units(resource_node: Node2D):
-	prune_invalid_selection()
-	ensure_unit_commander()
-
-	if unit_commander.has_method("command_harvest_units"):
-		unit_commander.call("command_harvest_units", selected_units, resource_node)
-
 func stop_selected_units():
 	ensure_unit_commander()
 	unit_commander.command_stop_units(selected_units)
@@ -236,21 +196,17 @@ func set_selection(units: Array[Node2D]):
 	for unit in units:
 		add_unit_to_selection(unit)
 
-	selection_changed.emit(selected_units)
-
 func add_unit_to_selection(unit: Node2D):
 	if unit == null or selected_units.has(unit):
 		return
 
 	selected_units.append(unit)
 	set_unit_selected(unit, true)
-	selection_changed.emit(selected_units)
 
 func toggle_unit_selection(unit: Node2D):
 	if selected_units.has(unit):
 		selected_units.erase(unit)
 		set_unit_selected(unit, false)
-		selection_changed.emit(selected_units)
 		return
 
 	add_unit_to_selection(unit)
@@ -264,7 +220,6 @@ func clear_selection():
 			set_unit_selected(unit, false)
 
 	selected_units.clear()
-	selection_changed.emit(selected_units)
 
 func ensure_unit_commander():
 	if unit_commander == null or not is_instance_valid(unit_commander):
@@ -285,9 +240,7 @@ func prune_invalid_selection():
 		if is_instance_valid(unit):
 			valid_units.append(unit)
 
-	if valid_units.size() != selected_units.size():
-		selected_units = valid_units
-		selection_changed.emit(selected_units)
+	selected_units = valid_units
 
 func set_unit_selected(unit: Node, selected: bool):
 	if unit != null and unit.has_method("set_selected"):
@@ -328,36 +281,6 @@ func get_hostile_target_under_screen_position(screen_position: Vector2) -> Node2
 			closest_target = target
 
 	return closest_target
-
-func get_resource_node_under_screen_position(screen_position: Vector2) -> Node2D:
-	var mouse_world_position = get_global_mouse_position()
-	var closest_node: Node2D = null
-	var closest_distance_squared = INF
-
-	for node in get_tree().get_nodes_in_group("resource_node"):
-		if not node is Node2D or not is_instance_valid(node):
-			continue
-
-		var node_2d = node as Node2D
-		var screen_hit = Rect2(screen_position - Vector2.ONE * 28.0, Vector2.ONE * 56.0).has_point(world_to_screen(node_2d.global_position))
-		var world_hit = false
-
-		if node.has_method("contains_world_position"):
-			world_hit = bool(node.call("contains_world_position", mouse_world_position))
-		elif node.has_method("get_hitbox") and node.call("get_hitbox") != null:
-			world_hit = HitboxMath.contains_point(node_2d, mouse_world_position)
-		else:
-			world_hit = node_2d.global_position.distance_to(mouse_world_position) <= 40.0
-
-		if not screen_hit and not world_hit:
-			continue
-
-		var distance_squared = node_2d.global_position.distance_squared_to(mouse_world_position)
-		if distance_squared < closest_distance_squared:
-			closest_distance_squared = distance_squared
-			closest_node = node_2d
-
-	return closest_node
 
 func get_attack_target_candidates_for_selection() -> Array[Node]:
 	if selected_units.is_empty():
@@ -414,16 +337,7 @@ func is_selection_input_enabled() -> bool:
 	var debug_active = bool(placement_manager.get("debug_active")) if has_property(placement_manager, "debug_active") else false
 	var placement_enabled = bool(placement_manager.get("placement_enabled")) if has_property(placement_manager, "placement_enabled") else false
 
-	if debug_active and placement_enabled:
-		return false
-	
-	# Check for economy debug placement as well
-	var economy_debug_manager = get_tree().get_first_node_in_group("economy_debug_manager")
-	if economy_debug_manager != null and economy_debug_manager.has_method("is_resource_node_placement_armed"):
-		if bool(economy_debug_manager.call("is_resource_node_placement_armed")):
-			return false
-
-	return true
+	return not (debug_active and placement_enabled)
 
 func has_property(object: Object, property_name: String) -> bool:
 	if object == null:
