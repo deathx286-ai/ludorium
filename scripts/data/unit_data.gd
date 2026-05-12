@@ -34,6 +34,13 @@ class_name UnitData
 @export_group("Economy")
 @export var can_harvest: bool = false
 @export var worker_type: EconomyTypes.WorkerType = EconomyTypes.WorkerType.NONE
+@export var training_time: float = 5.0
+@export var wood_cost: int = 0
+@export var food_cost: int = 0
+@export var gold_cost: int = 0
+@export var stone_cost: int = 0
+@export var metal_cost: int = 0
+@export var resource_cost: Dictionary = {}
 
 @export_group("Identity / Culture")
 @export var culture_tag: String = ""

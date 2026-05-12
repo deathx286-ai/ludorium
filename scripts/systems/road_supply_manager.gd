@@ -96,6 +96,9 @@ func register_building(building: Node2D, building_data: Resource = null, owner_n
 	if nation_key.is_empty():
 		return
 
+	if _is_under_construction(building):
+		return
+
 	var building_kind = EconomyTypes.get_building_kind_for_data(building_data)
 	var footprint_cells = _get_footprint_cells_for_node(building)
 	buildings_by_id[building.get_instance_id()] = {
@@ -511,3 +514,9 @@ func _get_property_or_null(object: Object, property_name: String):
 func _get_property_or_default(object: Object, property_name: String, default_value):
 	var value = _get_property_or_null(object, property_name)
 	return default_value if value == null else value
+
+func _is_under_construction(node: Node) -> bool:
+	var construction = node.get_node_or_null("ConstructionComponent")
+	if construction != null:
+		return bool(construction.get("is_under_construction"))
+	return false

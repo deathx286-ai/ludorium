@@ -32,6 +32,7 @@
 [ext_resource type="Script" uid="uid://bqunr1y5w2bub" path="res://scripts/ui/combat_ui_panel.gd" id="27_y6lxb"]
 [ext_resource type="Script" uid="uid://bk8uano13dbst" path="res://scripts/systems/economy_debug_manager.gd" id="28_economy_debug"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_panel.tscn" id="29_debug_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_ui.tscn" id="30_gameplay_ui"]
 
 [node name="TestMap" type="Node2D" unique_id=26370686]
 
@@ -138,6 +139,10 @@ status_label = NodePath("../../PlacementUI/DebugStatusLabel")
 script = ExtResource("24_selection_manager")
 placement_manager = NodePath("../Systems/PlacementManager")
 grid_manager = NodePath("../GridManager")
+click_drag_threshold = null
+drag_fill_color = null
+drag_outline_color = null
+defend_radius_tiles = null
 
 [node name="MainCamera" type="Camera2D" parent="." unique_id=555430404]
 position = Vector2(640, 360)
@@ -269,3 +274,5 @@ text = "Order: Idle"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Target: None"
+
+[node name="GameplayUI" parent="." unique_id=111222333 instance=ExtResource("30_gameplay_ui")]

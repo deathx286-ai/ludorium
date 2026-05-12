@@ -45,6 +45,7 @@ const PLACEMENT_ALLEGIANCE_OVERRIDE_COUNT := 5
 @export var selected_building_category: BuildingCategory = BuildingCategory.ALL
 @export var selected_allegiance_override: PlacementAllegianceOverride = PlacementAllegianceOverride.AUTO
 @export var placed_buildings_auto_spawn: bool = false
+@export var placed_buildings_under_construction: bool = false
 
 @export var nation_options: Array[Resource] = []
 @export var unit_options: Array[Resource] = []
@@ -83,7 +84,7 @@ func _ready():
 	_update_status_label()
 
 func _unhandled_input(event):
-	if not debug_active or not placement_enabled:
+	if not placement_enabled:
 		return
 
 	if _is_resource_node_placement_armed():
@@ -285,11 +286,18 @@ func place_selected_at(world_position: Vector2):
 				print("Placement blocked: ", _get_display_name(selected_data), " at cell ", cell, " - not enough resources")
 				return
 
-		spawned_node = building_spawner.spawn_building(selected_data, owner_nation, cell, placed_buildings_auto_spawn, selected_allegiance_override) if building_spawner != null else null
+		spawned_node = building_spawner.spawn_building(selected_data, owner_nation, cell, placed_buildings_auto_spawn, selected_allegiance_override, placed_buildings_under_construction) if building_spawner != null else null
 
 	if spawned_node != null:
 		last_action = "Placed %s at %s" % [_get_display_name(selected_data), cell]
 		print(last_action)
+	else:
+		_notify_player("Placement blocked: " + last_validation_result.get("reason", "invalid"))
+
+func _notify_player(message: String):
+	var gameplay_ui = get_tree().get_first_node_in_group("gameplay_ui")
+	if gameplay_ui != null and gameplay_ui.has_method("show_notification"):
+		gameplay_ui.call("show_notification", message)
 
 func validate_building_placement(building_data: Resource, owner_nation: Resource, cell: Vector2i) -> Dictionary:
 	if building_data == null:
@@ -353,8 +361,15 @@ func _refresh_options_from_selected_nation():
 	if selected_nation == null:
 		return
 
-	unit_options = _resource_array(selected_nation.get("available_units"))
-	building_options = _resource_array(selected_nation.get("available_buildings"))
+	if selected_nation.has_method("get_all_roster_units"):
+		unit_options = _resource_array(selected_nation.call("get_all_roster_units"))
+	else:
+		unit_options = _resource_array(selected_nation.get("available_units"))
+		
+	if selected_nation.has_method("get_all_buildings"):
+		building_options = _resource_array(selected_nation.call("get_all_buildings"))
+	else:
+		building_options = _resource_array(selected_nation.get("available_buildings"))
 
 	for unit_data in prototype_worker_options:
 		if unit_data != null and not unit_options.has(unit_data):

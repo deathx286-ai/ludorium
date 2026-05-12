@@ -9,6 +9,8 @@ class_name PlayerUnitSelectionManager
 @export var drag_outline_color: Color = Color(0.2, 0.75, 1.0, 0.85)
 @export var defend_radius_tiles: int = 6
 
+signal selection_changed(units: Array[Node2D])
+
 var selected_units: Array[Node2D] = []
 var is_dragging: bool = false
 var drag_start_screen_position: Vector2 = Vector2.ZERO
@@ -26,7 +28,7 @@ func _unhandled_input(event):
 		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
-		handle_key_command(event)tes
+		handle_key_command(event)
 		return
 
 	if event is InputEventMouseButton:
@@ -110,6 +112,7 @@ func finish_selection_drag(screen_position: Vector2, additive_selection: bool):
 		select_unit_under_mouse(additive_selection)
 
 	queue_redraw()
+	selection_changed.emit(selected_units)
 
 func select_unit_under_mouse(additive_selection: bool):
 	var unit = get_selectable_unit_under_mouse()
@@ -334,10 +337,9 @@ func is_selection_input_enabled() -> bool:
 	if placement_manager == null:
 		return true
 
-	var debug_active = bool(placement_manager.get("debug_active")) if has_property(placement_manager, "debug_active") else false
 	var placement_enabled = bool(placement_manager.get("placement_enabled")) if has_property(placement_manager, "placement_enabled") else false
 
-	return not (debug_active and placement_enabled)
+	return not placement_enabled
 
 func has_property(object: Object, property_name: String) -> bool:
 	if object == null:

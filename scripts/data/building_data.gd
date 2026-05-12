@@ -10,12 +10,21 @@ enum ResourceType {
 	METAL
 }
 
+enum BuildMenuCategory {
+	MILITARY,
+	DEFENSE,
+	ECONOMY,
+	INFRASTRUCTURE,
+	SPECIAL
+}
+
 @export_group("Identity")
 @export var building_id: String = ""
 @export var display_name: String = ""
 @export_multiline var description: String = ""
 @export var icon: Texture2D
 @export var sprite_texture: Texture2D
+@export var build_menu_category: BuildMenuCategory = BuildMenuCategory.MILITARY
 
 @export_group("Base Stats")
 @export var max_health: int = 200

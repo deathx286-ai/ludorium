@@ -57,9 +57,11 @@ var is_destroyed: bool = false
 var cached_grid_manager: Node = null
 var cached_occupancy_manager: Node = null
 var can_attack: bool = false
+var can_attack_override: bool = false
 var attack_damage: int = 0
 var attack_range_tiles: int = 0
 var attack_cooldown: float = 1.0
+var production_component: ProductionComponent = null
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var body_collision: CollisionShape2D = $CollisionShape2D
@@ -100,9 +102,18 @@ func _ready():
 	if auto_spawn_enabled:
 		for i in range(initial_unit_count):
 			spawn_unit()
+			
+	_setup_production()
 
 	if debug_logging:
 		print("Unit spawner building active. HP: ", current_health)
+
+func _setup_production():
+	production_component = get_node_or_null("ProductionComponent")
+	if production_component == null:
+		production_component = ProductionComponent.new()
+		production_component.name = "ProductionComponent"
+		add_child(production_component)
 
 func _process(delta):
 	if Engine.is_editor_hint():
@@ -122,7 +133,8 @@ func _process(delta):
 			if spawned_units.size() < max_alive_units:
 				spawn_unit()
 
-	process_auto_attack(delta)
+	if not can_attack_override:
+		process_auto_attack(delta)
 
 func update_process_mode():
 	if not is_inside_tree():
@@ -367,6 +379,13 @@ func get_alive_spawned_unit_count() -> int:
 			count += 1
 
 	return count
+
+func set_selected(selected: bool):
+	if health_bar != null:
+		health_bar.visible = selected or current_health < max_health
+	
+	if classification_label != null:
+		classification_label.visible = selected
 
 func process_auto_attack(delta: float):
 	if not should_auto_attack():

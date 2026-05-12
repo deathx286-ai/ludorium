@@ -14,11 +14,15 @@ class_name BaseBuilding
 		fallback_tile_size = max(value, 1)
 		apply_building_data()
 
+@export var construction_time: float = 10.0
+@export var start_under_construction: bool = false
+
 var max_health: int = 0
 var current_health: int = 0
 var footprint_width: int = 1
 var footprint_height: int = 1
 var can_attack: bool = false
+var can_attack_override: bool = false
 var attack_damage: int = 0
 var attack_range_tiles: int = 0
 var attack_cooldown: float = 1.0
@@ -28,6 +32,8 @@ var attack_timer: float = 0.0
 var target_scan_timer: float = 0.0
 var attack_target: Node2D = null
 var is_destroyed: bool = false
+var construction_component: ConstructionComponent = null
+var production_component: ProductionComponent = null
 
 @onready var sprite: Sprite2D = get_node_or_null("Sprite2D")
 @onready var body_collision: CollisionShape2D = get_node_or_null("CollisionShape2D")
@@ -55,8 +61,32 @@ func _ready():
 	if occupancy_manager != null:
 		occupancy_manager.register_node(self)
 
+	_setup_construction()
+	_setup_production()
+
+func _setup_construction():
+	construction_component = get_node_or_null("ConstructionComponent")
+	if construction_component == null:
+		construction_component = ConstructionComponent.new()
+		construction_component.name = "ConstructionComponent"
+		construction_component.construction_time = construction_time
+		add_child(construction_component)
+	
+	if start_under_construction:
+		construction_component.start_construction()
+
+func _setup_production():
+	if building_data != null and not bool(building_data.get("is_production_building")):
+		return
+		
+	production_component = get_node_or_null("ProductionComponent")
+	if production_component == null:
+		production_component = ProductionComponent.new()
+		production_component.name = "ProductionComponent"
+		add_child(production_component)
+
 func _process(delta: float):
-	if Engine.is_editor_hint() or is_destroyed or not should_auto_attack():
+	if Engine.is_editor_hint() or is_destroyed or not should_auto_attack() or can_attack_override:
 		return
 
 	attack_timer -= delta
@@ -360,6 +390,13 @@ func _update_sizes():
 
 func apply_nation_visuals():
 	NationVisuals.apply_owner_or_data_to_node(self, building_data)
+
+func set_selected(selected: bool):
+	if health_bar != null:
+		health_bar.visible = selected or current_health < max_health
+	
+	if classification_label != null:
+		classification_label.visible = selected
 
 func _spawn_subtype_indicator():
 	if Engine.is_editor_hint():

@@ -210,9 +210,41 @@ func update_combat_tab():
 		_add_label(vbox, "Recent Events:\n%s" % "\n".join(state.get("recent_events", [])))
 		_add_button(vbox, "Print Counter Matrix", func(): combat_debugger.call("verify_counter_system") if combat_debugger.has_method("verify_counter_system") else null)
 
-	_add_label(vbox, "Selected Combat Object:\n%s" % _format_selected_combat_object())
+	_add_label(vbox, "Selected Object:\n%s" % _format_selected_combat_object())
+	
+	var selected = _get_first_selected_unit()
+	if selected != null:
+		_show_selected_building_controls(vbox, selected)
+
 	_add_button(vbox, "Spawn Enemy Near Resource Node", func(): economy_debug_manager.call("spawn_enemy_combat_near_closest_resource_node") if economy_debug_manager != null and economy_debug_manager.has_method("spawn_enemy_combat_near_closest_resource_node") else null)
 	_add_button(vbox, "Spawn Enemy Combat Unit", func(): economy_debug_manager.call("spawn_enemy_combat_unit_at_mouse") if economy_debug_manager != null and economy_debug_manager.has_method("spawn_enemy_combat_unit_at_mouse") else null)
+
+func _show_selected_building_controls(vbox: VBoxContainer, selected: Node2D):
+	# Construction Info
+	var construction = selected.get_node_or_null("ConstructionComponent")
+	if construction != null and construction.get("is_under_construction"):
+		_add_label(vbox, "CONSTRUCTION PROGRESS: %.1f%%" % [construction.call("get_progress") * 100.0])
+		_add_button(vbox, "Finish Construction Instantly", func(): construction.call("finish_construction"))
+
+	# Production Info
+	var production = selected.get_node_or_null("ProductionComponent")
+	if production != null:
+		_add_label(vbox, "PRODUCTION")
+		_add_label(vbox, production.call("get_debug_summary"))
+		
+		var building_data = selected.get("building_data")
+		if building_data != null and placement_manager != null:
+			# For testing, let's just allow queuing the first few units from the nation's roster
+			var nation = placement_manager.call("get_selected_nation")
+			if nation != null:
+				var units = placement_manager.call("_resource_array", nation.get("available_units"))
+				if units.is_empty() and nation.has_method("get_all_roster_units"):
+					units = nation.call("get_all_roster_units")
+				
+				var row = _add_row(vbox)
+				for i in range(min(units.size(), 3)):
+					var unit = units[i]
+					_add_button(row, "Train %s" % unit.display_name, func(): production.call("add_to_queue", unit))
 
 func update_placement_tab():
 	var vbox = _reset_tab("Placement")
@@ -261,6 +293,7 @@ func update_placement_tab():
 	_add_checkbox(vbox, "Show supply radius", _get_bool(road_supply_manager, "show_supply_radius"), func(value): _set_if_connected(road_supply_manager, "show_supply_radius", value))
 	_add_checkbox(vbox, "Show road network", _get_bool(road_supply_manager, "show_road_network"), func(value): _set_if_connected(road_supply_manager, "show_road_network", value))
 	_add_checkbox(vbox, "Show outpost range", _get_bool(road_supply_manager, "show_outpost_range"), func(value): _set_if_connected(road_supply_manager, "show_outpost_range", value))
+	_add_checkbox(vbox, "Start Under Construction", _get_bool(placement_manager, "placed_buildings_under_construction"), func(value): placement_manager.set("placed_buildings_under_construction", value) if placement_manager != null else null)
 	_add_checkbox(vbox, "Free-build mode", bool(state.get("free_build_mode", false)), func(value): _set_free_build(value))
 	_add_checkbox(vbox, "Ignore-placement-rules mode", bool(state.get("ignore_placement_rules_mode", false)), func(value): _set_ignore_rules(value))
 

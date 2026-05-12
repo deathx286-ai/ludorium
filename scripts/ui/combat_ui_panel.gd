@@ -36,12 +36,20 @@ func _on_selection_changed(units: Array[Node2D]):
 		visible = false
 		return
 	
-	selected_unit = units[0]
-	if is_instance_valid(selected_unit):
+	var unit = units[0]
+	
+	# Only show if it's a unit, not a building
+	var is_building = unit.has_method("is_structure") and unit.call("is_structure")
+	if not is_building and "building_data" in unit:
+		is_building = unit.get("building_data") != null
+		
+	if is_instance_valid(unit) and not is_building:
+		selected_unit = unit
 		update_static_stats()
 		update_dynamic_stats()
 		visible = true
 	else:
+		selected_unit = null
 		visible = false
 
 func update_static_stats():

@@ -10,6 +10,9 @@ class_name UnitSpawner
 @export var grid_manager: Node
 @export var grid_occupancy_manager: Node
 
+func _ready():
+	add_to_group("unit_spawner")
+
 func spawn_unit(unit_data: UnitData, owner_nation: Resource, cell: Vector2i, allegiance_override: int = 0) -> Node2D:
 	if unit_data == null:
 		return null

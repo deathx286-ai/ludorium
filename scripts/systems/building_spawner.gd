@@ -9,7 +9,7 @@ class_name BuildingSpawner
 @export var grid_occupancy_manager: Node
 @export var road_supply_manager: Node
 
-func spawn_building(building_data: Resource, owner_nation: Resource, cell: Vector2i, auto_spawn_enabled: bool = false, allegiance_override: int = 0) -> Node2D:
+func spawn_building(building_data: Resource, owner_nation: Resource, cell: Vector2i, auto_spawn_enabled: bool = false, allegiance_override: int = 0, under_construction: bool = false) -> Node2D:
 	if building_data == null:
 		return null
 
@@ -27,6 +27,9 @@ func spawn_building(building_data: Resource, owner_nation: Resource, cell: Vecto
 
 	if _has_property(building, "auto_spawn_enabled"):
 		building.set("auto_spawn_enabled", auto_spawn_enabled or bool(building_data.get("is_enemy_camp")))
+		
+	if under_construction and _has_property(building, "start_under_construction"):
+		building.set("start_under_construction", true)
 
 	_set_cell_position(
 		building,

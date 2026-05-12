@@ -1,0 +1,194 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/gameplay_ui.gd" id="1_root"]
+[ext_resource type="Script" path="res://scripts/ui/resource_bar.gd" id="2_res"]
+[ext_resource type="Script" path="res://scripts/ui/selection_panel.gd" id="3_sel"]
+[ext_resource type="Script" path="res://scripts/ui/building_menu.gd" id="4_menu"]
+[ext_resource type="Theme" uid="uid://b8r0vyl7dna0k" path="res://data/ui/fantasy_theme.tres" id="5_theme"]
+
+[node name="GameplayUI" type="CanvasLayer"]
+script = ExtResource("1_root")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="ResourceBar" type="PanelContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+
+[node name="HBox" type="HBoxContainer" parent="Control/ResourceBar"]
+layout_mode = 2
+alignment = 1
+script = ExtResource("2_res")
+
+[node name="WoodLabel" type="Label" parent="Control/ResourceBar/HBox"]
+layout_mode = 2
+text = "🪵: 0"
+
+[node name="FoodLabel" type="Label" parent="Control/ResourceBar/HBox"]
+layout_mode = 2
+text = "🍞: 0"
+
+[node name="GoldLabel" type="Label" parent="Control/ResourceBar/HBox"]
+layout_mode = 2
+text = "💰: 0"
+
+[node name="StoneLabel" type="Label" parent="Control/ResourceBar/HBox"]
+layout_mode = 2
+text = "🪨: 0"
+
+[node name="MetalLabel" type="Label" parent="Control/ResourceBar/HBox"]
+layout_mode = 2
+text = "⚔️: 0"
+
+[node name="SelectionPanel" type="PanelContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -220.0
+offset_right = 320.0
+offset_bottom = -20.0
+grow_vertical = 0
+script = ExtResource("3_sel")
+
+[node name="VBox" type="VBoxContainer" parent="Control/SelectionPanel"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Control/SelectionPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Unit Name"
+
+[node name="OwnerLabel" type="Label" parent="Control/SelectionPanel/VBox"]
+layout_mode = 2
+text = "Owner: Nation"
+
+[node name="HealthLabel" type="Label" parent="Control/SelectionPanel/VBox"]
+layout_mode = 2
+text = "HP: 100/100"
+
+[node name="StatsLabel" type="Label" parent="Control/SelectionPanel/VBox"]
+layout_mode = 2
+text = "Atk: 10 Spd: 150"
+
+[node name="ConstructionLabel" type="Label" parent="Control/SelectionPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+text = "Building..."
+
+[node name="ProductionContainer" type="VBoxContainer" parent="Control/SelectionPanel/VBox"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="Control/SelectionPanel/VBox/ProductionContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/SelectionPanel/VBox/ProductionContainer"]
+layout_mode = 2
+text = "Production"
+
+[node name="QueueLabel" type="Label" parent="Control/SelectionPanel/VBox/ProductionContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Queue: 0/5"
+
+[node name="ProgressBar" type="ProgressBar" parent="Control/SelectionPanel/VBox/ProductionContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="ButtonsGrid" type="GridContainer" parent="Control/SelectionPanel/VBox/ProductionContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="BuildingMenu" type="PanelContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -450.0
+offset_top = -250.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("4_menu")
+
+[node name="VBox" type="VBoxContainer" parent="Control/BuildingMenu"]
+layout_mode = 2
+
+[node name="CategoryButtons" type="HBoxContainer" parent="Control/BuildingMenu/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="MilBtn" type="Button" parent="Control/BuildingMenu/VBox/CategoryButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+text = "Military"
+
+[node name="DefBtn" type="Button" parent="Control/BuildingMenu/VBox/CategoryButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Defense"
+
+[node name="EcoBtn" type="Button" parent="Control/BuildingMenu/VBox/CategoryButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Economy"
+
+[node name="InfBtn" type="Button" parent="Control/BuildingMenu/VBox/CategoryButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Infra"
+
+[node name="SpecBtn" type="Button" parent="Control/BuildingMenu/VBox/CategoryButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Special"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/BuildingMenu/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsGrid" type="GridContainer" parent="Control/BuildingMenu/VBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 2
+
+[node name="NotificationLabel" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 60.0
+offset_right = 200.0
+offset_bottom = 86.0
+grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Notification Message"
+horizontal_alignment = 1
