@@ -309,14 +309,31 @@ func validate_building_placement(building_data: Resource, owner_nation: Resource
 			return _record_validation(false, EconomyTypes.PlacementFailure.NOT_ENOUGH_RESOURCES, cell)
 
 	if road_supply_manager != null and road_supply_manager.has_method("validate_building_placement"):
-		last_validation_result = road_supply_manager.call(
+		var result = road_supply_manager.call(
 			"validate_building_placement",
 			building_data,
 			owner_nation,
 			cell,
 			ignore_placement_rules_mode
 		)
-		return last_validation_result
+		
+		# If road supply says it's invalid, return that
+		if not bool(result.get("valid", false)):
+			last_validation_result = result
+			return result
+		
+		# If road supply says it's valid, we STILL need to check occupancy
+		# unless ignore_placement_rules_mode is on
+		if not ignore_placement_rules_mode:
+			var footprint_width = maxi(int(building_data.get("footprint_width")), 1)
+			var footprint_height = maxi(int(building_data.get("footprint_height")), 1)
+			var snapped_world_position = grid_manager.snap_world_to_footprint_center(grid_manager.cell_to_world(cell), footprint_width, footprint_height)
+			
+			if grid_occupancy_manager != null and not grid_occupancy_manager.can_occupy_world_position(snapped_world_position, footprint_width, footprint_height):
+				return _record_validation(false, EconomyTypes.PlacementFailure.OCCUPIED_CELL, cell)
+		
+		last_validation_result = result
+		return result
 
 	var footprint_width = maxi(int(building_data.get("footprint_width")), 1)
 	var footprint_height = maxi(int(building_data.get("footprint_height")), 1)

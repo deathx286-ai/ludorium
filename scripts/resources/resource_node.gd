@@ -165,7 +165,7 @@ func is_worker_in_harvest_range(worker: Node2D) -> bool:
 func is_contested() -> bool:
 	for data in assigned_harvesters.values():
 		var worker = data.get("worker", null)
-		if worker is Node2D and is_instance_valid(worker) and is_contested_for_worker(worker):
+		if is_instance_valid(worker) and worker is Node2D and is_contested_for_worker(worker):
 			return true
 
 	return false
@@ -179,7 +179,7 @@ func is_contested_for_worker(worker: Node2D) -> bool:
 
 	for group_name in ["player", "ally", "enemy", "enemy_unit"]:
 		for node in get_tree().get_nodes_in_group(group_name):
-			if node == worker or not node is Node2D or not is_instance_valid(node):
+			if not is_instance_valid(node) or node == worker or not node is Node2D:
 				continue
 
 			var node_id = node.get_instance_id()

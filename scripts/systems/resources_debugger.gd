@@ -287,7 +287,7 @@ func _refresh_income_values():
 		return
 
 	for node in get_tree().get_nodes_in_group("resource_building"):
-		if node is Node and _is_node_inside_scan_root(node):
+		if is_instance_valid(node) and node is Node and _is_node_inside_scan_root(node):
 			_collect_income_from_building(node, income_by_resource)
 
 	income_wood_per_second = income_by_resource[BuildingData.ResourceType.WOOD]

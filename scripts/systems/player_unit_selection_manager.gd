@@ -23,6 +23,13 @@ func _ready():
 	add_to_group("player_selection_manager")
 	ensure_unit_commander()
 
+func _process(_delta):
+	if not selected_units.is_empty():
+		var original_count = selected_units.size()
+		prune_invalid_selection()
+		if selected_units.size() != original_count:
+			selection_changed.emit(selected_units)
+
 func _unhandled_input(event):
 	if not is_selection_input_enabled():
 		return

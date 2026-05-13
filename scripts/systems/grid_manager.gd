@@ -1,18 +1,18 @@
 @tool
-
 extends Node2D
+class_name GridManager
 
 @export var tile_size: int = 64:
 	set(value):
 		tile_size = value
 		queue_redraw()
 
-@export var grid_width: int = 50:
+@export var grid_width: int = 384:
 	set(value):
 		grid_width = value
 		queue_redraw()
 
-@export var grid_height: int = 35:
+@export var grid_height: int = 384:
 	set(value):
 		grid_height = value
 		queue_redraw()
@@ -37,7 +37,7 @@ extends Node2D
 		keep_grid_lines_screen_width = value
 		queue_redraw()
 
-@export var max_pathfinding_cells: int = 500
+@export var max_pathfinding_cells: int = 5000
 
 const CARDINAL_DIRECTIONS := [
 	Vector2i(1, 0),
@@ -57,9 +57,60 @@ var reserved_cells := {}
 var reserved_nodes_by_id := {}
 var occupancy_manager: Node = null
 
+# Map data storage
+var tile_data := {} # Map of Vector2i to Dictionary
+
+@export_group("Visual Toggles")
+var show_terrain: bool = true:
+	set(value):
+		show_terrain = value
+		queue_redraw()
+
+var show_region_borders: bool = false:
+	set(value):
+		show_region_borders = value
+		queue_redraw()
+
+var show_region_labels: bool = true:
+	set(value):
+		show_region_labels = value
+		_update_label_visibility()
+		queue_redraw()
+
+var show_region_debug: bool = false:
+	set(value):
+		show_region_debug = value
+		queue_redraw()
+
+var _last_camera_pos: Vector2
+var _last_camera_zoom: Vector2
+
 func _ready():
 	occupancy_manager = get_tree().get_first_node_in_group("grid_occupancy_manager")
+	call_deferred("_update_label_visibility")
 	queue_redraw()
+
+func _process(_delta):
+	var camera = get_viewport().get_camera_2d()
+	if camera != null:
+		if camera.global_position != _last_camera_pos or camera.zoom != _last_camera_zoom:
+			_last_camera_pos = camera.global_position
+			_last_camera_zoom = camera.zoom
+			queue_redraw()
+
+func _update_label_visibility():
+	var world_gen = get_tree().get_first_node_in_group("world_generator")
+	if world_gen != null and world_gen.get("label_parent") != null:
+		world_gen.get("label_parent").visible = show_region_labels
+
+func set_tile_info(cell: Vector2i, info: Dictionary):
+	tile_data[cell] = info
+
+func get_tile_info(cell: Vector2i) -> Dictionary:
+	return tile_data.get(cell, {})
+
+func clear_all_tile_data():
+	tile_data.clear()
 
 func get_map_width() -> int:
 	return grid_width * tile_size
@@ -80,6 +131,35 @@ func get_bottom_bound() -> float:
 	return get_map_height() / 2.0
 
 func _draw():
+	var camera = get_viewport().get_camera_2d()
+	if camera == null:
+		return
+		
+	var viewport_rect = get_viewport_rect()
+	var canvas_transform = get_viewport().get_canvas_transform()
+	var screen_to_world = canvas_transform.affine_inverse()
+	
+	var top_left = screen_to_world * Vector2.ZERO
+	var bottom_right = screen_to_world * viewport_rect.size
+	
+	var start_cell = world_to_cell(top_left)
+	var end_cell = world_to_cell(bottom_right)
+	
+	# Add a small margin
+	start_cell.x = maxi(start_cell.x - 1, 0)
+	start_cell.y = maxi(start_cell.y - 1, 0)
+	end_cell.x = mini(end_cell.x + 1, grid_width - 1)
+	end_cell.y = mini(end_cell.y + 1, grid_height - 1)
+
+	if show_terrain:
+		_draw_terrain_layer(start_cell, end_cell)
+
+	if show_region_borders:
+		_draw_borders_layer(start_cell, end_cell)
+
+	if show_region_debug:
+		_draw_debug_layer(start_cell, end_cell)
+
 	if not show_grid:
 		return
 
@@ -110,6 +190,80 @@ func _draw():
 			color,
 			line_width
 		)
+
+func _draw_terrain_layer(start: Vector2i, end: Vector2i):
+	var left = get_left_bound()
+	var top = get_top_bound()
+	
+	for y in range(start.y, end.y + 1):
+		for x in range(start.x, end.x + 1):
+			var cell = Vector2i(x, y)
+			var info = tile_data.get(cell)
+			if info != null and info.has("terrain_color"):
+				var rect = Rect2(
+					left + x * tile_size,
+					top + y * tile_size,
+					tile_size,
+					tile_size
+				)
+				draw_rect(rect, info["terrain_color"])
+
+func _draw_borders_layer(start: Vector2i, end: Vector2i):
+	var left = get_left_bound()
+	var top = get_top_bound()
+	var border_color = Color(1, 1, 1, 0.4)
+	var line_width = 2.0
+	
+	for y in range(start.y, end.y + 1):
+		for x in range(start.x, end.x + 1):
+			var cell = Vector2i(x, y)
+			var current_info = tile_data.get(cell)
+			if current_info == null: continue
+			
+			var current_type = current_info.get("region_type")
+			
+			# Check Right neighbor
+			if x < grid_width - 1:
+				var right_cell = Vector2i(x + 1, y)
+				var right_info = tile_data.get(right_cell)
+				if right_info != null and right_info.get("region_type") != current_type:
+					var line_x = left + (x + 1) * tile_size
+					draw_line(
+						Vector2(line_x, top + y * tile_size),
+						Vector2(line_x, top + (y + 1) * tile_size),
+						border_color,
+						line_width
+					)
+			
+			# Check Bottom neighbor
+			if y < grid_height - 1:
+				var bottom_cell = Vector2i(x, y + 1)
+				var bottom_info = tile_data.get(bottom_cell)
+				if bottom_info != null and bottom_info.get("region_type") != current_type:
+					var line_y = top + (y + 1) * tile_size
+					draw_line(
+						Vector2(left + x * tile_size, line_y),
+						Vector2(left + (x + 1) * tile_size, line_y),
+						border_color,
+						line_width
+					)
+
+func _draw_debug_layer(start: Vector2i, end: Vector2i):
+	var left = get_left_bound()
+	var top = get_top_bound()
+	
+	for y in range(start.y, end.y + 1):
+		for x in range(start.x, end.x + 1):
+			var cell = Vector2i(x, y)
+			var info = tile_data.get(cell)
+			if info != null and info.has("debug_color"):
+				var rect = Rect2(
+					left + x * tile_size,
+					top + y * tile_size,
+					tile_size,
+					tile_size
+				)
+				draw_rect(rect, info["debug_color"])
 
 func world_to_cell(world_position: Vector2) -> Vector2i:
 	var local_position = to_local(world_position)

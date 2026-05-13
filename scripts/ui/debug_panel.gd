@@ -14,6 +14,7 @@ class_name DebugPanel
 @export var road_supply_manager: Node
 @export var resource_manager: Node
 @export var player_selection_manager: Node
+@export var world_generator: Node
 
 var root_control: Control
 var panel: PanelContainer
@@ -100,7 +101,7 @@ func _build_panel():
 	tabs.visible = not compact_mode
 	outer_vbox.add_child(tabs)
 
-	for tab_name in ["Overview", "Diplomacy", "Resources", "Combat", "Placement", "Spawning / Testing", "Shortcuts / Help"]:
+	for tab_name in ["Overview", "Diplomacy", "Resources", "Combat", "Placement", "Spawning / Testing", "World", "Shortcuts / Help"]:
 		_add_tab(tab_name)
 
 func _add_tab(tab_name: String):
@@ -129,6 +130,7 @@ func _refresh_all_tabs():
 	update_combat_tab()
 	update_placement_tab()
 	update_spawning_tab()
+	update_world_tab()
 	update_shortcuts_tab()
 
 func update_overview_tab():
@@ -350,6 +352,44 @@ func update_spawning_tab():
 	]:
 		_add_button(vbox, "Spawn %s" % EconomyTypes.get_building_kind_name(kind), Callable(self, "_spawn_building_kind_from_panel").bind(kind))
 
+func update_world_tab():
+	var vbox = _reset_tab("World")
+	
+	if world_generator == null:
+		_add_label(vbox, "World Generator not connected")
+		return
+	
+	_add_label(vbox, "Seed: %d" % world_generator.get("world_seed"))
+	_add_label(vbox, "Region Seeds: %d" % world_generator.get("region_seed_count"))
+	_add_label(vbox, "Start Zone Radius: Inner %d / Ring %d" % [world_generator.get("inner_start_clear_radius"), world_generator.get("starter_resource_ring_radius")])
+	
+	var res_spawned = world_generator.get("total_resources_spawned")
+	var res_max = world_generator.get("max_total_resource_nodes")
+	var starter_spawned = world_generator.get("total_starter_resources_spawned")
+	_add_label(vbox, "Resources: %d / %d (Starter: %d, Normal: %d)" % [res_spawned, res_max, starter_spawned, res_spawned - starter_spawned])
+	
+	var props_spawned = world_generator.get("total_props_spawned")
+	var props_max = world_generator.get("max_total_props")
+	_add_label(vbox, "Props: %d / %d" % [props_spawned, props_max])
+	
+	_add_label(vbox, "Blobs: %d, Labels: %d" % [world_generator.get("total_region_blobs"), world_generator.get("total_labels_drawn")])
+	
+	_add_button(vbox, "Randomize Seed", func():
+		world_generator.set("world_seed", randi() % 100000)
+		world_generator.call("generate_world")
+	)
+	
+	_add_button(vbox, "Regenerate World", func():
+		world_generator.call("generate_world")
+	)
+	
+	var grid = get_tree().get_first_node_in_group("grid_manager")
+	if grid != null:
+		_add_checkbox(vbox, "Show Terrain Visuals", bool(grid.get("show_terrain")), func(val): grid.set("show_terrain", val))
+		_add_checkbox(vbox, "Show Region Borders", bool(grid.get("show_region_borders")), func(val): grid.set("show_region_borders", val))
+		_add_checkbox(vbox, "Show Region Labels", bool(grid.get("show_region_labels")), func(val): grid.set("show_region_labels", val))
+		_add_checkbox(vbox, "Show Region Debug Overlay", bool(grid.get("show_region_debug")), func(val): grid.set("show_region_debug", val))
+
 func update_shortcuts_tab():
 	var vbox = _reset_tab("Shortcuts / Help")
 
@@ -376,7 +416,8 @@ func _add_label(parent: Node, text: String) -> Label:
 	label.text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	parent.add_child(label)
+	if parent != null:
+		parent.add_child(label)
 	return label
 
 func _add_button(parent: Node, text: String, callback: Callable) -> Button:
@@ -384,7 +425,8 @@ func _add_button(parent: Node, text: String, callback: Callable) -> Button:
 	button.text = text
 	button.focus_mode = Control.FOCUS_NONE
 	button.pressed.connect(callback)
-	parent.add_child(button)
+	if parent != null:
+		parent.add_child(button)
 	return button
 
 func _add_checkbox(parent: Node, text: String, pressed: bool, callback: Callable) -> CheckBox:
@@ -393,13 +435,15 @@ func _add_checkbox(parent: Node, text: String, pressed: bool, callback: Callable
 	checkbox.button_pressed = pressed
 	checkbox.focus_mode = Control.FOCUS_NONE
 	checkbox.toggled.connect(callback)
-	parent.add_child(checkbox)
+	if parent != null:
+		parent.add_child(checkbox)
 	return checkbox
 
 func _add_row(parent: Node) -> HBoxContainer:
 	var row = HBoxContainer.new()
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	parent.add_child(row)
+	if parent != null:
+		parent.add_child(row)
 	return row
 
 func _add_tab_button(parent: Node, text: String, selected: bool, callback: Callable) -> Button:
@@ -408,7 +452,8 @@ func _add_tab_button(parent: Node, text: String, selected: bool, callback: Calla
 	button.disabled = selected
 	button.focus_mode = Control.FOCUS_NONE
 	button.pressed.connect(callback)
-	parent.add_child(button)
+	if parent != null:
+		parent.add_child(button)
 	return button
 
 func _add_option_tabs(parent: Node, title: String, options: Array, callback_method: String, columns: int = 4):
@@ -727,7 +772,7 @@ func _get_first_selected_unit() -> Node2D:
 		return null
 
 	for unit in player_selection_manager.get("selected_units"):
-		if unit is Node2D and is_instance_valid(unit):
+		if is_instance_valid(unit) and unit is Node2D:
 			return unit
 
 	return null
@@ -751,6 +796,8 @@ func _discover_managers():
 		resource_manager = get_tree().get_first_node_in_group("resource_manager")
 	if player_selection_manager == null:
 		player_selection_manager = get_tree().get_first_node_in_group("player_selection_manager")
+	if world_generator == null:
+		world_generator = get_tree().get_first_node_in_group("world_generator")
 
 func _call_dictionary(node: Node, method_name: String) -> Dictionary:
 	if node == null or not node.has_method(method_name):

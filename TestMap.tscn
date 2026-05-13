@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" path="res://scenes/Buildings/BaseBuilding.tscn" id="2_base_building"]
 [ext_resource type="Script" uid="uid://cmf508mr3cq0y" path="res://scripts/systems/player_manager.gd" id="3_xxdj2"]
 [ext_resource type="Script" uid="uid://u4l5732250wo" path="res://scripts/systems/run_manager.gd" id="4_hvnfr"]
+[ext_resource type="Script" path="res://scripts/systems/fog_of_war_manager.gd" id="4_fog"]
+[ext_resource type="Script" path="res://scripts/systems/world_generator.gd" id="4_world"]
 [ext_resource type="Script" uid="uid://dyhyt6cqjn2pg" path="res://scripts/systems/upgrade_manager.gd" id="5_1y0um"]
 [ext_resource type="Script" uid="uid://ckmgyrpcndspl" path="res://scripts/systems/world_manager.gd" id="6_4ykif"]
 [ext_resource type="Script" uid="uid://b8u8c63ympwne" path="res://scripts/systems/godmanager.gd" id="7_43vq4"]
@@ -52,6 +54,18 @@ script = ExtResource("6_4ykif")
 
 [node name="GodManager" type="Node" parent="Systems" unique_id=942011978 groups=["god_manager"]]
 script = ExtResource("7_43vq4")
+
+[node name="FogOfWarManager" type="CanvasLayer" parent="Systems" unique_id=123456789 groups=["fog_of_war_manager"]]
+script = ExtResource("4_fog")
+visible_radius_tiles = 50
+
+[node name="WorldGenerator" type="Node" parent="Systems" unique_id=987654321 groups=["world_generator"]]
+script = ExtResource("4_world")
+start_zone_radius = 30
+max_total_resource_nodes = 400
+minimum_resource_spacing_tiles = 6
+max_total_props = 2000
+minimum_prop_spacing_tiles = 3
 
 [node name="GridOccupancyManager" type="Node" parent="Systems" unique_id=1989092087 groups=["grid_occupancy_manager"]]
 script = ExtResource("8_43vq4")
@@ -145,11 +159,11 @@ drag_outline_color = null
 defend_radius_tiles = null
 
 [node name="MainCamera" type="Camera2D" parent="." unique_id=555430404]
-position = Vector2(640, 360)
-limit_left = -1422
-limit_top = -1359
-limit_right = 1778
-limit_bottom = 881
+position = Vector2(0, 0)
+limit_left = -12288
+limit_top = -12288
+limit_right = 12288
+limit_bottom = 12288
 script = ExtResource("8_1y0um")
 
 [node name="GridManager" type="Node2D" parent="." unique_id=2076019186 groups=["grid_manager"]]
@@ -160,7 +174,7 @@ script = ExtResource("26_road_supply")
 grid_manager = NodePath("../GridManager")
 grid_occupancy_manager = NodePath("../Systems/GridOccupancyManager")
 
-[node name="DebugPanel" parent="." unique_id=772315522 node_paths=PackedStringArray("debug_manager", "diplomacy_debugger", "resources_debugger", "combat_debugger", "placement_manager", "economy_debug_manager", "road_supply_manager", "resource_manager", "player_selection_manager") instance=ExtResource("29_debug_panel")]
+[node name="DebugPanel" parent="." unique_id=772315522 node_paths=PackedStringArray("debug_manager", "diplomacy_debugger", "resources_debugger", "combat_debugger", "placement_manager", "economy_debug_manager", "road_supply_manager", "resource_manager", "player_selection_manager", "world_generator") instance=ExtResource("29_debug_panel")]
 debug_manager = NodePath("../Systems/DebugManager")
 diplomacy_debugger = NodePath("../Systems/DiplomacyDebugger")
 resources_debugger = NodePath("../Systems/ResourcesDebugger")
@@ -170,6 +184,7 @@ economy_debug_manager = NodePath("../Systems/EconomyDebugManager")
 road_supply_manager = NodePath("../RoadSupplyManager")
 resource_manager = NodePath("../Systems/ResourceManager")
 player_selection_manager = NodePath("../PlayerSelectionManager")
+world_generator = NodePath("../Systems/WorldGenerator")
 
 [node name="PlacementUI" type="CanvasLayer" parent="." unique_id=170445265]
 

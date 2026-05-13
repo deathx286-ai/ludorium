@@ -74,7 +74,7 @@ func rebuild_from_scene():
 		return
 
 	for node in get_tree().get_nodes_in_group("player") + get_tree().get_nodes_in_group("ally") + get_tree().get_nodes_in_group("enemy") + get_tree().get_nodes_in_group("neutral"):
-		if node is Node2D and _get_property_or_null(node, "building_data") != null:
+		if is_instance_valid(node) and node is Node2D and _get_property_or_null(node, "building_data") != null:
 			register_building(node)
 
 	queue_redraw()

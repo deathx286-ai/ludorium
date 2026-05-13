@@ -122,7 +122,10 @@ func _register_occupancy(building: Node):
 	if grid_occupancy_manager == null or not grid_occupancy_manager.has_method("register_node"):
 		return
 
-	if building is BaseBuilding or building is UnitSpawnerBuilding:
+	if not (building is BaseBuilding or building is UnitSpawnerBuilding):
+		# If it's not one of our standard classes, we still try to register it if it's a Node2D
+		if building is Node2D:
+			grid_occupancy_manager.register_node(building)
 		return
 
 	grid_occupancy_manager.register_node(building)
