@@ -70,7 +70,7 @@ static func get_resource_name(resource_type: int) -> String:
 static func get_resource_key(resource_type: int) -> String:
 	return get_resource_name(resource_type).to_lower()
 
-static func get_resource_type_from_key(resource_key: String) -> int:
+static func get_resource_type_from_key(resource_key: String) -> BuildingData.ResourceType:
 	match resource_key.strip_edges().to_lower():
 		"wood":
 			return BuildingData.ResourceType.WOOD
@@ -169,10 +169,10 @@ static func normalize_cost(cost: Dictionary) -> Dictionary:
 		normalized[resource_type] = 0
 
 	for key in cost.keys():
-		var resource_type = BuildingData.ResourceType.NONE
+		var resource_type: BuildingData.ResourceType = BuildingData.ResourceType.NONE
 
 		if key is int:
-			resource_type = int(key)
+			resource_type = int(key) as BuildingData.ResourceType
 		else:
 			resource_type = get_resource_type_from_key(str(key))
 
@@ -214,6 +214,23 @@ static func get_cost_for_building_data(building_data: Resource) -> Dictionary:
 
 	return get_default_cost_for_building_kind(get_building_kind_for_data(building_data))
 
+static func get_cost_for_unit_data(unit_data: Resource) -> Dictionary:
+	if unit_data == null:
+		return {}
+
+	var data_cost = _get_property_or_default(unit_data, "resource_cost", {})
+	if data_cost is Dictionary and not data_cost.is_empty():
+		return normalize_cost(data_cost)
+
+	var cost := {}
+	for resource_type in RESOURCE_TYPES:
+		var property_name = "%s_cost" % get_resource_key(resource_type)
+		var amount = int(_get_property_or_default(unit_data, property_name, 0))
+		if amount > 0:
+			cost[resource_type] = amount
+
+	return normalize_cost(cost)
+
 static func get_default_cost_for_building_kind(building_kind: int) -> Dictionary:
 	match building_kind:
 		BuildingKind.ROAD:
@@ -245,11 +262,11 @@ static func get_default_cost_for_building_kind(building_kind: int) -> Dictionary
 		_:
 			return normalize_cost({"wood": 80, "stone": 40})
 
-static func get_building_kind_for_data(building_data: Resource) -> int:
+static func get_building_kind_for_data(building_data: Resource) -> BuildingKind:
 	if building_data == null:
 		return BuildingKind.AUTO
 
-	var explicit_kind = int(_get_property_or_default(building_data, "building_kind", BuildingKind.AUTO))
+	var explicit_kind := int(_get_property_or_default(building_data, "building_kind", BuildingKind.AUTO)) as BuildingKind
 	if explicit_kind != BuildingKind.AUTO:
 		return explicit_kind
 
@@ -297,7 +314,7 @@ static func is_supply_anchor_kind(building_kind: int) -> bool:
 static func is_road_connector_kind(building_kind: int) -> bool:
 	return building_kind == BuildingKind.ROAD or building_kind == BuildingKind.GATE or is_supply_anchor_kind(building_kind)
 
-static func get_required_worker_for_resource(resource_type: int) -> int:
+static func get_required_worker_for_resource(resource_type: int) -> WorkerType:
 	match resource_type:
 		BuildingData.ResourceType.WOOD:
 			return WorkerType.LUMBER

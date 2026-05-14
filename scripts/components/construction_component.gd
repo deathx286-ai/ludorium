@@ -15,6 +15,7 @@ var parent_building: Node2D
 
 func _ready():
 	parent_building = get_parent() as Node2D
+	set_process(false)
 	if auto_start:
 		start_construction()
 
@@ -36,6 +37,7 @@ func start_construction(time_override: float = -1.0):
 		construction_time = time_override
 	
 	is_under_construction = true
+	set_process(true)
 	current_progress = 0.0
 	
 	if parent_building != null:
@@ -48,6 +50,7 @@ func start_construction(time_override: float = -1.0):
 
 func finish_construction():
 	is_under_construction = false
+	set_process(false)
 	current_progress = construction_time
 	
 	_update_parent_health(1.0)

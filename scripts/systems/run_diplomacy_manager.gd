@@ -88,7 +88,7 @@ func get_pairwise_relationship(nation_a: Resource, nation_b: Resource) -> UnitOw
 	if key.is_empty():
 		return UnitOwnershipComponent.Allegiance.NEUTRAL
 
-	return pairwise_relationships.get(key, UnitOwnershipComponent.Allegiance.NEUTRAL)
+	return int(pairwise_relationships.get(key, UnitOwnershipComponent.Allegiance.NEUTRAL)) as UnitOwnershipComponent.Allegiance
 
 func has_pairwise_relationship(nation_a: Resource, nation_b: Resource) -> bool:
 	var key = get_pairwise_key(nation_a, nation_b)

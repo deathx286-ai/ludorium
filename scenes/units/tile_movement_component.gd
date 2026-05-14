@@ -59,9 +59,7 @@ func physics_step(delta: float):
 		redirect_to_blocked_waypoint_fallback()
 		return
 
-	var distance_to_waypoint = owner_body.global_position.distance_to(current_waypoint)
-
-	if distance_to_waypoint <= waypoint_arrival_distance:
+	if _is_within_arrival_distance(current_waypoint):
 		complete_current_step()
 		return
 
@@ -86,7 +84,7 @@ func move_to_world_position(world_position: Vector2) -> bool:
 		if current_cell != resolved_cell:
 			return false
 
-		if owner_body.global_position.distance_to(resolved_position) > waypoint_arrival_distance:
+		if not _is_within_arrival_distance(resolved_position):
 			target_position = resolved_position
 			set_path([resolved_position])
 			return true
@@ -113,7 +111,7 @@ func move_to_world_position_exact(world_position: Vector2) -> bool:
 		if current_cell != requested_cell:
 			return false
 
-		if owner_body.global_position.distance_to(resolved_position) > waypoint_arrival_distance:
+		if not _is_within_arrival_distance(resolved_position):
 			target_position = resolved_position
 			set_path([resolved_position])
 			return true
@@ -209,13 +207,13 @@ func is_committed_step_in_progress() -> bool:
 	if owner_body == null:
 		return false
 
-	return is_moving and owner_body.global_position.distance_to(current_waypoint) > waypoint_arrival_distance
+	return is_moving and not _is_within_arrival_distance(current_waypoint)
 
 func is_on_tile_center() -> bool:
 	if owner_body == null or grid_manager == null:
 		return true
 
-	return owner_body.global_position.distance_to(get_snapped_position(owner_body.global_position)) <= waypoint_arrival_distance
+	return _is_within_arrival_distance(get_snapped_position(owner_body.global_position))
 
 func snap_to_tile_center_if_close() -> bool:
 	if owner_body == null or grid_manager == null:
@@ -223,7 +221,7 @@ func snap_to_tile_center_if_close() -> bool:
 
 	var snapped_position = get_snapped_position(owner_body.global_position)
 
-	if owner_body.global_position.distance_to(snapped_position) > waypoint_arrival_distance:
+	if not _is_within_arrival_distance(snapped_position):
 		return false
 
 	owner_body.global_position = snapped_position
@@ -237,7 +235,7 @@ func settle_to_nearest_tile():
 
 	var settle_position = get_snapped_position(owner_body.global_position)
 
-	if owner_body.global_position.distance_to(settle_position) <= waypoint_arrival_distance:
+	if _is_within_arrival_distance(settle_position):
 		owner_body.global_position = settle_position
 		stop()
 		update_occupancy()
@@ -278,7 +276,7 @@ func get_nearest_free_cell_around_blocked_target(blocked_cell: Vector2i) -> Vect
 		if path.is_empty() and not can_move_over_blocking_occupancy():
 			continue
 
-		var distance = owner_body.global_position.distance_to(world_pos)
+		var distance = owner_body.global_position.distance_squared_to(world_pos)
 
 		if distance < best_distance:
 			best_distance = distance
@@ -336,7 +334,7 @@ func redirect_to_blocked_waypoint_fallback():
 
 	var fallback_position = get_best_blocked_move_fallback()
 
-	if owner_body.global_position.distance_to(fallback_position) <= waypoint_arrival_distance:
+	if _is_within_arrival_distance(fallback_position):
 		owner_body.global_position = fallback_position
 		last_completed_tile_position = fallback_position
 		active_waypoint_start_position = fallback_position
@@ -417,7 +415,7 @@ func snap_to_current_waypoint_if_close():
 	if not is_moving:
 		return
 
-	if owner_body.global_position.distance_to(current_waypoint) > waypoint_arrival_distance:
+	if not _is_within_arrival_distance(current_waypoint):
 		return
 
 	owner_body.global_position = current_waypoint
@@ -529,3 +527,9 @@ func set_owner_velocity(new_velocity: Vector2):
 func clear_owner_movement_ignore():
 	if owner_body != null and owner_body.has_method("clear_movement_ignore_nodes"):
 		owner_body.call("clear_movement_ignore_nodes")
+
+func _is_within_arrival_distance(world_position: Vector2) -> bool:
+	if owner_body == null:
+		return true
+
+	return owner_body.global_position.distance_squared_to(world_position) <= waypoint_arrival_distance * waypoint_arrival_distance

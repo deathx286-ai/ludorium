@@ -8,6 +8,9 @@ class_name FogOfWarManager
 var grid_manager: Node
 var shroud_rect: ColorRect
 var reveal_material: ShaderMaterial
+var last_screen_to_world: Transform2D = Transform2D()
+var last_center: Vector2 = Vector2.INF
+var last_half_size_px: float = -1.0
 
 func _ready():
 	add_to_group("fog_of_war_manager")
@@ -63,9 +66,19 @@ func _process(_delta):
 	if camera != null:
 		var canvas_transform = get_viewport().get_canvas_transform()
 		var screen_to_world = canvas_transform.affine_inverse()
-		
 		var center = camera.global_position if follow_camera else Vector2.ZERO
-		
+
+		if (
+			screen_to_world == last_screen_to_world
+			and center == last_center
+			and half_size_px == last_half_size_px
+		):
+			return
+
+		last_screen_to_world = screen_to_world
+		last_center = center
+		last_half_size_px = half_size_px
+
 		reveal_material.set_shader_parameter("center_world", center)
 		reveal_material.set_shader_parameter("half_size_world", half_size_px)
 		reveal_material.set_shader_parameter("screen_to_world_matrix", screen_to_world)

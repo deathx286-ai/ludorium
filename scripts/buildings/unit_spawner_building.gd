@@ -63,7 +63,7 @@ var attack_range_tiles: int = 0
 var attack_cooldown: float = 1.0
 var production_component: ProductionComponent = null
 
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: Sprite2D = get_node_or_null("Sprite2D")
 @onready var body_collision: CollisionShape2D = $CollisionShape2D
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_collision: CollisionShape2D = $Hitbox/CollisionShape2D
@@ -346,18 +346,16 @@ func is_spawn_position_clear(possible_position: Vector2, players: Array) -> bool
 	if grid_manager != null and grid_manager.is_footprint_occupied(possible_position, 1, 1, self):
 		return false
 
+	var min_distance_squared := min_spawn_distance_from_units * min_spawn_distance_from_units
+
 	for spawned_unit in spawned_units:
 		if is_instance_valid(spawned_unit):
-			var distance = possible_position.distance_to(spawned_unit.global_position)
-
-			if distance < min_spawn_distance_from_units:
+			if possible_position.distance_squared_to(spawned_unit.global_position) < min_distance_squared:
 				return false
 
 	for player in players:
 		if player is Node2D:
-			var distance = possible_position.distance_to(player.global_position)
-
-			if distance < min_spawn_distance_from_units:
+			if possible_position.distance_squared_to(player.global_position) < min_distance_squared:
 				return false
 
 	return true
@@ -464,7 +462,8 @@ func is_target_in_attack_tile_range(target: Node2D) -> bool:
 	var grid_manager = get_grid_manager()
 
 	if grid_manager == null:
-		return global_position.distance_to(target.global_position) <= float(attack_range_tiles * fallback_tile_size)
+		var attack_range_pixels := float(attack_range_tiles * fallback_tile_size)
+		return global_position.distance_squared_to(target.global_position) <= attack_range_pixels * attack_range_pixels
 
 	var self_cells = grid_manager.get_footprint_cells_for_node(self)
 	var target_cells = grid_manager.get_footprint_cells_for_node(target)

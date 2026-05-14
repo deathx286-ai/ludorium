@@ -665,14 +665,14 @@ func find_cardinal_cell_path_with_blocked_lookup(
 		if searched_cell_count > max_pathfinding_cells:
 			break
 
-		var current_cell = frontier[frontier_index]
+		var frontier_cell = frontier[frontier_index]
 		frontier_index += 1
 
-		if current_cell == target_cell:
+		if frontier_cell == target_cell:
 			break
 
 		for direction in CARDINAL_DIRECTIONS:
-			var next_cell = current_cell + direction
+			var next_cell = frontier_cell + direction
 
 			if not is_cell_in_bounds(next_cell):
 				continue
@@ -683,18 +683,18 @@ func find_cardinal_cell_path_with_blocked_lookup(
 			if next_cell != target_cell and blocked_cells.has(next_cell):
 				continue
 
-			came_from[next_cell] = current_cell
+			came_from[next_cell] = frontier_cell
 			frontier.append(next_cell)
 
 	if not came_from.has(target_cell):
 		return []
 
 	var reversed_path: Array[Vector2i] = []
-	var current_cell = target_cell
+	var path_cell = target_cell
 
-	while current_cell != start_cell:
-		reversed_path.append(current_cell)
-		current_cell = came_from[current_cell]
+	while path_cell != start_cell:
+		reversed_path.append(path_cell)
+		path_cell = came_from[path_cell]
 
 	reversed_path.reverse()
 	return reversed_path

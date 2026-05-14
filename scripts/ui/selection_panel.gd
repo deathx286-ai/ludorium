@@ -1,6 +1,8 @@
 extends Control
 class_name SelectionPanel
 
+@export var dynamic_refresh_interval: float = 0.1
+
 @onready var name_label: Label = $VBox/NameLabel
 @onready var health_label: Label = $VBox/HealthLabel
 @onready var owner_label: Label = $VBox/OwnerLabel
@@ -13,21 +15,29 @@ class_name SelectionPanel
 @onready var production_buttons_grid: GridContainer = $VBox/ProductionContainer/ButtonsGrid
 
 var current_target: Node2D = null
+var dynamic_refresh_timer: float = 0.0
 
 func _ready():
 	visible = false
+	set_process(false)
 
-func _process(_delta):
+func _process(delta):
 	if visible and is_instance_valid(current_target):
-		_update_dynamic_info()
+		dynamic_refresh_timer -= delta
+		if dynamic_refresh_timer <= 0.0:
+			dynamic_refresh_timer = dynamic_refresh_interval
+			_update_dynamic_info()
 
 func set_target(target: Node2D):
 	current_target = target
 	if target == null:
 		visible = false
+		set_process(false)
 		return
 	
 	visible = true
+	set_process(true)
+	dynamic_refresh_timer = 0.0
 	_update_static_info()
 	_update_dynamic_info()
 	_update_production_controls()
@@ -117,18 +127,7 @@ func _update_production_controls():
 	for unit in filtered_units:
 		var btn = Button.new()
 		btn.text = unit.display_name
-		
-		# Get cost
-		var cost = {}
-		if "resource_cost" in unit and not unit.resource_cost.is_empty():
-			cost = unit.resource_cost
-		else:
-			if unit.get("wood_cost") > 0: cost[BuildingData.ResourceType.WOOD] = unit.wood_cost
-			if unit.get("food_cost") > 0: cost[BuildingData.ResourceType.FOOD] = unit.food_cost
-			if unit.get("gold_cost") > 0: cost[BuildingData.ResourceType.GOLD] = unit.gold_cost
-			if unit.get("stone_cost") > 0: cost[BuildingData.ResourceType.STONE] = unit.stone_cost
-			if unit.get("metal_cost") > 0: cost[BuildingData.ResourceType.METAL] = unit.metal_cost
-			
+		var cost = EconomyTypes.get_cost_for_unit_data(unit)
 		btn.tooltip_text = "Cost: %s" % EconomyTypes.format_cost(cost)
 		btn.pressed.connect(func(): production.call("add_to_queue", unit))
 		production_buttons_grid.add_child(btn)
@@ -159,13 +158,6 @@ func _get_player_nation() -> Resource:
 	if diplomacy != null:
 		return diplomacy.get("selected_player_nation")
 	return null
-
-func _format_cost(unit_data: Resource) -> String:
-	var parts = []
-	if unit_data.get("wood_cost") > 0: parts.append("Wood: %d" % unit_data.wood_cost)
-	if unit_data.get("food_cost") > 0: parts.append("Food: %d" % unit_data.food_cost)
-	if unit_data.get("gold_cost") > 0: parts.append("Gold: %d" % unit_data.gold_cost)
-	return ", ".join(parts) if not parts.is_empty() else "Free"
 
 func _update_production_progress():
 	var production = current_target.get_node_or_null("ProductionComponent")

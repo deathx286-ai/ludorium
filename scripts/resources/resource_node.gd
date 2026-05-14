@@ -5,7 +5,7 @@ class_name ResourceNode
 @export var resource_type: BuildingData.ResourceType = BuildingData.ResourceType.WOOD:
 	set(value):
 		resource_type = value
-		required_worker_type = EconomyTypes.get_required_worker_for_resource(resource_type)
+		required_worker_type = EconomyTypes.get_required_worker_for_resource(resource_type) as EconomyTypes.WorkerType
 		_update_visuals()
 
 @export var required_worker_type: EconomyTypes.WorkerType = EconomyTypes.WorkerType.LUMBER:
@@ -48,7 +48,7 @@ func _ready():
 		return
 
 	_register_occupancy()
-	set_process(true)
+	set_process(false)
 
 func _exit_tree():
 	if Engine.is_editor_hint():
@@ -60,6 +60,10 @@ func _exit_tree():
 
 func _process(delta: float):
 	if Engine.is_editor_hint():
+		return
+
+	if assigned_harvesters.is_empty():
+		set_process(false)
 		return
 
 	_tick_harvesters(delta)
@@ -110,6 +114,7 @@ func request_harvester(worker: Node2D) -> bool:
 		"paused": false
 	}
 	_print_harvest("harvest start: %s -> %s" % [_get_node_display_name(worker), name])
+	set_process(true)
 	_update_visuals()
 	queue_redraw()
 	return true
@@ -124,6 +129,12 @@ func stop_harvester(worker: Node2D, reason: String = "stopped"):
 
 	assigned_harvesters.erase(worker_id)
 	_print_harvest("harvest stop: %s -> %s (%s)" % [_get_node_display_name(worker), name, reason])
+
+	if assigned_harvesters.is_empty():
+		set_process(false)
+		if contested:
+			contested = false
+
 	_update_visuals()
 	queue_redraw()
 
@@ -131,7 +142,7 @@ func is_harvestable_by(worker: Node) -> bool:
 	if worker == null or not is_instance_valid(worker):
 		return false
 
-	var worker_type = EconomyTypes.WorkerType.NONE
+	var worker_type: int = EconomyTypes.WorkerType.NONE
 	var unit_data = _get_property_or_null(worker, "unit_data")
 	if unit_data != null:
 		if not bool(_get_property_or_default(unit_data, "can_harvest", false)):
@@ -160,7 +171,8 @@ func is_worker_in_harvest_range(worker: Node2D) -> bool:
 
 		return false
 
-	return worker.global_position.distance_to(global_position) <= harvest_range * _get_tile_size()
+	var harvest_range_pixels := harvest_range * _get_tile_size()
+	return worker.global_position.distance_squared_to(global_position) <= harvest_range_pixels * harvest_range_pixels
 
 func is_contested() -> bool:
 	for data in assigned_harvesters.values():
@@ -175,6 +187,7 @@ func is_contested_for_worker(worker: Node2D) -> bool:
 		return false
 
 	var radius_pixels = contest_radius * _get_tile_size()
+	var radius_squared = radius_pixels * radius_pixels
 	var seen_ids := {}
 
 	for group_name in ["player", "ally", "enemy", "enemy_unit"]:
@@ -189,7 +202,7 @@ func is_contested_for_worker(worker: Node2D) -> bool:
 			seen_ids[node_id] = true
 			var candidate = node as Node2D
 
-			if candidate.global_position.distance_to(global_position) > radius_pixels:
+			if candidate.global_position.distance_squared_to(global_position) > radius_squared:
 				continue
 
 			if not _is_combat_unit(candidate):

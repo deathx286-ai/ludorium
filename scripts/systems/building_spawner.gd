@@ -66,18 +66,18 @@ func _assign_ownership(building: Node, owner_nation: Resource, allegiance_overri
 		ownership.name = "UnitOwnershipComponent"
 		building.add_child(ownership)
 
-	var allegiance = _get_overridden_allegiance(allegiance_override)
+	var allegiance := _get_overridden_allegiance(allegiance_override)
 
 	if allegiance != -1:
 		pass
 	elif run_diplomacy_manager != null and run_diplomacy_manager.has_method("get_allegiance_for_nation"):
-		allegiance = run_diplomacy_manager.get_allegiance_for_nation(owner_nation)
+		allegiance = int(run_diplomacy_manager.get_allegiance_for_nation(owner_nation))
 	elif run_diplomacy_manager != null and run_diplomacy_manager.has_method("get_combat_allegiance_for_nation"):
-		allegiance = run_diplomacy_manager.get_combat_allegiance_for_nation(owner_nation)
+		allegiance = int(run_diplomacy_manager.get_combat_allegiance_for_nation(owner_nation))
 	else:
 		allegiance = UnitOwnershipComponent.Allegiance.NEUTRAL
 
-	ownership.set_ownership(owner_nation, allegiance)
+	ownership.set_ownership(owner_nation, allegiance as UnitOwnershipComponent.Allegiance)
 
 func _get_overridden_allegiance(allegiance_override: int) -> int:
 	match allegiance_override:

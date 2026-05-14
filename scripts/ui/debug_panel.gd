@@ -42,9 +42,9 @@ func _process(delta: float):
 	_refresh_timer = refresh_interval
 	_refresh_all_tabs()
 
-func set_debug_visible(is_visible: bool):
-	debug_enabled = is_visible
-	visible = is_visible
+func set_debug_visible(visible_enabled: bool):
+	debug_enabled = visible_enabled
+	visible = visible_enabled
 
 func set_compact_mode(is_compact: bool):
 	compact_mode = is_compact
@@ -162,8 +162,14 @@ func update_diplomacy_tab():
 	_add_label(vbox, "Selected Nation: %s" % state.get("selected_player_nation", "Unknown"))
 	_add_label(vbox, "Selected Pair: %s" % state.get("selected_pair", "None"))
 	_add_label(vbox, "Relationships:\n%s" % state.get("relationship_summary", ""))
-	_add_button(vbox, "Cycle Pair", func(): diplomacy_debugger.call("cycle_pair", 1) if diplomacy_debugger.has_method("cycle_pair") else null)
-	_add_button(vbox, "Set/Cycle Relationship", func(): diplomacy_debugger.call("cycle_selected_pair_relationship") if diplomacy_debugger.has_method("cycle_selected_pair_relationship") else null)
+	_add_button(vbox, "Cycle Pair", func():
+		if diplomacy_debugger.has_method("cycle_pair"):
+			diplomacy_debugger.call("cycle_pair", 1)
+	)
+	_add_button(vbox, "Set/Cycle Relationship", func():
+		if diplomacy_debugger.has_method("cycle_selected_pair_relationship"):
+			diplomacy_debugger.call("cycle_selected_pair_relationship")
+	)
 	_add_button(vbox, "Print Diplomacy State", func(): print(state.get("pairwise_summary", "")))
 
 func update_resources_tab():
@@ -210,7 +216,10 @@ func update_combat_tab():
 	else:
 		var state = _call_dictionary(combat_debugger, "get_debug_state")
 		_add_label(vbox, "Recent Events:\n%s" % "\n".join(state.get("recent_events", [])))
-		_add_button(vbox, "Print Counter Matrix", func(): combat_debugger.call("verify_counter_system") if combat_debugger.has_method("verify_counter_system") else null)
+		_add_button(vbox, "Print Counter Matrix", func():
+			if combat_debugger.has_method("verify_counter_system"):
+				combat_debugger.call("verify_counter_system")
+		)
 
 	_add_label(vbox, "Selected Object:\n%s" % _format_selected_combat_object())
 	
@@ -218,8 +227,14 @@ func update_combat_tab():
 	if selected != null:
 		_show_selected_building_controls(vbox, selected)
 
-	_add_button(vbox, "Spawn Enemy Near Resource Node", func(): economy_debug_manager.call("spawn_enemy_combat_near_closest_resource_node") if economy_debug_manager != null and economy_debug_manager.has_method("spawn_enemy_combat_near_closest_resource_node") else null)
-	_add_button(vbox, "Spawn Enemy Combat Unit", func(): economy_debug_manager.call("spawn_enemy_combat_unit_at_mouse") if economy_debug_manager != null and economy_debug_manager.has_method("spawn_enemy_combat_unit_at_mouse") else null)
+	_add_button(vbox, "Spawn Enemy Near Resource Node", func():
+		if economy_debug_manager != null and economy_debug_manager.has_method("spawn_enemy_combat_near_closest_resource_node"):
+			economy_debug_manager.call("spawn_enemy_combat_near_closest_resource_node")
+	)
+	_add_button(vbox, "Spawn Enemy Combat Unit", func():
+		if economy_debug_manager != null and economy_debug_manager.has_method("spawn_enemy_combat_unit_at_mouse"):
+			economy_debug_manager.call("spawn_enemy_combat_unit_at_mouse")
+	)
 
 func _show_selected_building_controls(vbox: VBoxContainer, selected: Node2D):
 	# Construction Info
@@ -295,7 +310,10 @@ func update_placement_tab():
 	_add_checkbox(vbox, "Show supply radius", _get_bool(road_supply_manager, "show_supply_radius"), func(value): _set_if_connected(road_supply_manager, "show_supply_radius", value))
 	_add_checkbox(vbox, "Show road network", _get_bool(road_supply_manager, "show_road_network"), func(value): _set_if_connected(road_supply_manager, "show_road_network", value))
 	_add_checkbox(vbox, "Show outpost range", _get_bool(road_supply_manager, "show_outpost_range"), func(value): _set_if_connected(road_supply_manager, "show_outpost_range", value))
-	_add_checkbox(vbox, "Start Under Construction", _get_bool(placement_manager, "placed_buildings_under_construction"), func(value): placement_manager.set("placed_buildings_under_construction", value) if placement_manager != null else null)
+	_add_checkbox(vbox, "Start Under Construction", _get_bool(placement_manager, "placed_buildings_under_construction"), func(value):
+		if placement_manager != null:
+			placement_manager.set("placed_buildings_under_construction", value)
+	)
 	_add_checkbox(vbox, "Free-build mode", bool(state.get("free_build_mode", false)), func(value): _set_free_build(value))
 	_add_checkbox(vbox, "Ignore-placement-rules mode", bool(state.get("ignore_placement_rules_mode", false)), func(value): _set_ignore_rules(value))
 

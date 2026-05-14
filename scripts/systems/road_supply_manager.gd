@@ -1,6 +1,13 @@
 extends Node2D
 class_name RoadSupplyManager
 
+const CARDINAL_DIRECTIONS: Array[Vector2i] = [
+	Vector2i(1, 0),
+	Vector2i(-1, 0),
+	Vector2i(0, 1),
+	Vector2i(0, -1)
+]
+
 @export var grid_manager: Node
 @export var grid_occupancy_manager: Node
 @export var default_supply_radius_tiles: int = 12
@@ -368,12 +375,16 @@ func _does_footprint_overlap_resource_node(cells: Array[Vector2i]) -> bool:
 	if grid_manager == null:
 		return false
 
+	var footprint_lookup := {}
+	for cell in cells:
+		footprint_lookup[cell] = true
+
 	for resource_node in get_tree().get_nodes_in_group("resource_node"):
 		if not resource_node is Node2D:
 			continue
 
 		for resource_cell in grid_manager.get_footprint_cells_for_node(resource_node):
-			if cells.has(resource_cell):
+			if footprint_lookup.has(resource_cell):
 				return true
 
 	return false
@@ -395,12 +406,15 @@ func _is_adjacent_to_cell_dictionary(footprint_cells: Array[Vector2i], cell_dict
 	if cell_dictionary.is_empty():
 		return false
 
-	var cardinal_directions = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+	var footprint_lookup := {}
 
 	for cell in footprint_cells:
-		for direction in cardinal_directions:
+		footprint_lookup[cell] = true
+
+	for cell in footprint_cells:
+		for direction in CARDINAL_DIRECTIONS:
 			var neighbor = cell + direction
-			if footprint_cells.has(neighbor):
+			if footprint_lookup.has(neighbor):
 				continue
 			if cell_dictionary.has(neighbor):
 				return true

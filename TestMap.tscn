@@ -3,9 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://ct2xjaw1re4sn" path="res://scenes/units/Soldier.tscn" id="1_soldier"]
 [ext_resource type="PackedScene" path="res://scenes/Buildings/BaseBuilding.tscn" id="2_base_building"]
 [ext_resource type="Script" uid="uid://cmf508mr3cq0y" path="res://scripts/systems/player_manager.gd" id="3_xxdj2"]
+[ext_resource type="Script" uid="uid://grx5br0jyqj1" path="res://scripts/systems/fog_of_war_manager.gd" id="4_fog"]
 [ext_resource type="Script" uid="uid://u4l5732250wo" path="res://scripts/systems/run_manager.gd" id="4_hvnfr"]
-[ext_resource type="Script" path="res://scripts/systems/fog_of_war_manager.gd" id="4_fog"]
-[ext_resource type="Script" path="res://scripts/systems/world_generator.gd" id="4_world"]
+[ext_resource type="Script" uid="uid://dj7xivswmd5o6" path="res://scripts/systems/world_generator.gd" id="4_world"]
 [ext_resource type="Script" uid="uid://dyhyt6cqjn2pg" path="res://scripts/systems/upgrade_manager.gd" id="5_1y0um"]
 [ext_resource type="Script" uid="uid://ckmgyrpcndspl" path="res://scripts/systems/world_manager.gd" id="6_4ykif"]
 [ext_resource type="Script" uid="uid://b8u8c63ympwne" path="res://scripts/systems/godmanager.gd" id="7_43vq4"]
@@ -57,15 +57,9 @@ script = ExtResource("7_43vq4")
 
 [node name="FogOfWarManager" type="CanvasLayer" parent="Systems" unique_id=123456789 groups=["fog_of_war_manager"]]
 script = ExtResource("4_fog")
-visible_radius_tiles = 50
 
 [node name="WorldGenerator" type="Node" parent="Systems" unique_id=987654321 groups=["world_generator"]]
 script = ExtResource("4_world")
-start_zone_radius = 30
-max_total_resource_nodes = 400
-minimum_resource_spacing_tiles = 6
-max_total_props = 2000
-minimum_prop_spacing_tiles = 3
 
 [node name="GridOccupancyManager" type="Node" parent="Systems" unique_id=1989092087 groups=["grid_occupancy_manager"]]
 script = ExtResource("8_43vq4")
@@ -153,13 +147,8 @@ status_label = NodePath("../../PlacementUI/DebugStatusLabel")
 script = ExtResource("24_selection_manager")
 placement_manager = NodePath("../Systems/PlacementManager")
 grid_manager = NodePath("../GridManager")
-click_drag_threshold = null
-drag_fill_color = null
-drag_outline_color = null
-defend_radius_tiles = null
 
 [node name="MainCamera" type="Camera2D" parent="." unique_id=555430404]
-position = Vector2(0, 0)
 limit_left = -12288
 limit_top = -12288
 limit_right = 12288

@@ -60,13 +60,13 @@ func _get_allegiance(owner_nation: Resource, allegiance_override: int = 0) -> Un
 	var overridden_allegiance = _get_overridden_allegiance(allegiance_override)
 
 	if overridden_allegiance != -1:
-		return overridden_allegiance
+		return overridden_allegiance as UnitOwnershipComponent.Allegiance
 
 	if run_diplomacy_manager != null and run_diplomacy_manager.has_method("get_allegiance_for_nation"):
-		return run_diplomacy_manager.get_allegiance_for_nation(owner_nation)
+		return int(run_diplomacy_manager.get_allegiance_for_nation(owner_nation)) as UnitOwnershipComponent.Allegiance
 
 	if run_diplomacy_manager != null and run_diplomacy_manager.has_method("get_combat_allegiance_for_nation"):
-		return run_diplomacy_manager.get_combat_allegiance_for_nation(owner_nation)
+		return int(run_diplomacy_manager.get_combat_allegiance_for_nation(owner_nation)) as UnitOwnershipComponent.Allegiance
 
 	var owner_nation_id = str(owner_nation.get("nation_id")) if owner_nation != null else ""
 

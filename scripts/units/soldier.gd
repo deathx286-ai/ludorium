@@ -78,9 +78,8 @@ func handle_left_click():
 
 	# Otherwise, left-click selects or deselects the Soldier.
 	var mouse_pos = get_global_mouse_position()
-	var distance_to_mouse = global_position.distance_to(mouse_pos)
 
-	if distance_to_mouse <= 35.0:
+	if global_position.distance_squared_to(mouse_pos) <= 35.0 * 35.0:
 		set_selected(true)
 	else:
 		set_selected(false)
@@ -214,7 +213,7 @@ func has_reached_order_destination() -> bool:
 			and movement_component.is_settled()
 		)
 
-	return global_position.distance_to(combat_orders.destination) <= waypoint_arrival_distance
+	return global_position.distance_squared_to(combat_orders.destination) <= waypoint_arrival_distance * waypoint_arrival_distance
 
 func is_on_tile_center() -> bool:
 	return movement_component.is_on_tile_center()

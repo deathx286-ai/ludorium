@@ -30,21 +30,21 @@ static func contains_point(node: Node2D, point: Vector2) -> bool:
 	var hitbox = get_hitbox_area(node)
 
 	if hitbox == null:
-		return node.global_position.distance_to(point) <= 35.0
+		return node.global_position.distance_squared_to(point) <= 35.0 * 35.0
 
 	var collision_shape = hitbox.get_node_or_null("CollisionShape2D") as CollisionShape2D
 
 	if collision_shape == null or collision_shape.shape == null:
-		return hitbox.global_position.distance_to(point) <= 35.0
+		return hitbox.global_position.distance_squared_to(point) <= 35.0 * 35.0
 
 	if collision_shape.shape is RectangleShape2D:
 		return get_hitbox_rect(node).has_point(point)
 
 	if collision_shape.shape is CircleShape2D:
 		var shape = collision_shape.shape as CircleShape2D
-		return hitbox.global_position.distance_to(point) <= shape.radius
+		return hitbox.global_position.distance_squared_to(point) <= shape.radius * shape.radius
 
-	return node.global_position.distance_to(point) <= 35.0
+	return node.global_position.distance_squared_to(point) <= 35.0 * 35.0
 
 static func distance_from_point_to_hitbox(point: Vector2, node: Node2D) -> float:
 	var hitbox = get_hitbox_area(node)

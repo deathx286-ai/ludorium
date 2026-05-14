@@ -22,6 +22,7 @@ var attack_move_armed: bool = false
 func _ready():
 	add_to_group("player_selection_manager")
 	ensure_unit_commander()
+	set_process(false)
 
 func _process(_delta):
 	if not selected_units.is_empty():
@@ -29,6 +30,9 @@ func _process(_delta):
 		prune_invalid_selection()
 		if selected_units.size() != original_count:
 			selection_changed.emit(selected_units)
+
+		if selected_units.is_empty():
+			set_process(false)
 
 func _unhandled_input(event):
 	if not is_selection_input_enabled():
@@ -51,7 +55,7 @@ func _draw():
 	if not is_dragging:
 		return
 
-	if drag_start_screen_position.distance_to(drag_current_screen_position) < click_drag_threshold:
+	if drag_start_screen_position.distance_squared_to(drag_current_screen_position) < click_drag_threshold * click_drag_threshold:
 		return
 
 	var drag_rect = Rect2(
@@ -113,7 +117,7 @@ func finish_selection_drag(screen_position: Vector2, additive_selection: bool):
 	drag_current_screen_position = screen_position
 	drag_current_world_position = get_global_mouse_position()
 
-	if drag_start_screen_position.distance_to(drag_current_screen_position) >= click_drag_threshold:
+	if drag_start_screen_position.distance_squared_to(drag_current_screen_position) >= click_drag_threshold * click_drag_threshold:
 		select_units_in_drag_rect(additive_selection)
 	else:
 		select_unit_under_mouse(additive_selection)
@@ -211,6 +215,7 @@ func add_unit_to_selection(unit: Node2D):
 		return
 
 	selected_units.append(unit)
+	set_process(true)
 	set_unit_selected(unit, true)
 
 func toggle_unit_selection(unit: Node2D):
@@ -230,6 +235,7 @@ func clear_selection():
 			set_unit_selected(unit, false)
 
 	selected_units.clear()
+	set_process(false)
 
 func ensure_unit_commander():
 	if unit_commander == null or not is_instance_valid(unit_commander):
@@ -329,7 +335,7 @@ func is_mouse_over_unit(unit: Node2D, mouse_world_position: Vector2) -> bool:
 	if unit.has_method("get_hitbox") and unit.call("get_hitbox") != null:
 		return HitboxMath.contains_point(unit, mouse_world_position)
 
-	return unit.global_position.distance_to(mouse_world_position) <= 36.0
+	return unit.global_position.distance_squared_to(mouse_world_position) <= 36.0 * 36.0
 
 func get_drag_screen_rect() -> Rect2:
 	return Rect2(

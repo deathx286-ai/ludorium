@@ -298,9 +298,9 @@ func spawn_building_kind(building_kind: int, cell: Vector2i, owner_nation: Resou
 			print("Building placement blocked: not enough resources")
 			return null
 
-	var override = PlacementManager.PlacementAllegianceOverride.AUTO
+	var override: PlacementManager.PlacementAllegianceOverride = PlacementManager.PlacementAllegianceOverride.AUTO
 	if placement_manager != null and _has_property(placement_manager, "selected_allegiance_override"):
-		override = int(placement_manager.get("selected_allegiance_override"))
+		override = int(placement_manager.get("selected_allegiance_override")) as PlacementManager.PlacementAllegianceOverride
 
 	var building = building_spawner.spawn_building(building_data, owner_nation, cell, false, override) if building_spawner != null else null
 	if building != null:

@@ -19,6 +19,7 @@ var parent_building: Node2D
 
 func _ready():
 	parent_building = get_parent() as Node2D
+	set_process(false)
 
 func _process(delta: float):
 	if _is_under_construction():
@@ -27,6 +28,8 @@ func _process(delta: float):
 	if current_unit_data == null:
 		if not production_queue.is_empty():
 			_start_next_in_queue()
+		else:
+			set_process(false)
 		return
 
 	current_progress += delta
@@ -47,6 +50,7 @@ func add_to_queue(unit_data: UnitData) -> bool:
 
 	_spend_resources(unit_data)
 	production_queue.append(unit_data)
+	set_process(true)
 	queue_changed.emit()
 	return true
 
@@ -57,6 +61,8 @@ func cancel_index(index: int):
 	var unit_data = production_queue[index]
 	_refund_resources(unit_data)
 	production_queue.remove_at(index)
+	if current_unit_data == null and production_queue.is_empty():
+		set_process(false)
 	queue_changed.emit()
 
 func _start_next_in_queue():
@@ -76,6 +82,8 @@ func _finish_current_production():
 		production_finished.emit(current_unit_data, spawned_unit)
 		current_unit_data = null
 		current_progress = 0.0
+		if production_queue.is_empty():
+			set_process(false)
 	else:
 		# If spawn failed (e.g. blocked), we wait and try again next frame
 		# but we should probably alert the user
@@ -121,19 +129,7 @@ func _refund_resources(unit_data: UnitData):
 			resource_manager.call("add_resource", nation, type, cost[type])
 
 func _get_unit_cost(unit_data: UnitData) -> Dictionary:
-	# Extract cost from UnitData. Assuming it has similar properties to BuildingData
-	# or a dedicated resource_cost Dictionary
-	if "resource_cost" in unit_data and not unit_data.resource_cost.is_empty():
-		return unit_data.resource_cost
-		
-	var cost = {}
-	if "wood_cost" in unit_data and unit_data.wood_cost > 0: cost[BuildingData.ResourceType.WOOD] = unit_data.wood_cost
-	if "food_cost" in unit_data and unit_data.food_cost > 0: cost[BuildingData.ResourceType.FOOD] = unit_data.food_cost
-	if "gold_cost" in unit_data and unit_data.gold_cost > 0: cost[BuildingData.ResourceType.GOLD] = unit_data.gold_cost
-	if "stone_cost" in unit_data and unit_data.stone_cost > 0: cost[BuildingData.ResourceType.STONE] = unit_data.stone_cost
-	if "metal_cost" in unit_data and unit_data.metal_cost > 0: cost[BuildingData.ResourceType.METAL] = unit_data.metal_cost
-	
-	return cost
+	return EconomyTypes.get_cost_for_unit_data(unit_data)
 
 func _spawn_unit(unit_data: UnitData) -> Node2D:
 	var unit_spawner = get_tree().get_first_node_in_group("unit_spawner")

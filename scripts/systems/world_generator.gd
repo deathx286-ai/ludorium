@@ -202,7 +202,10 @@ func _assign_tiles_to_regions():
 	print("Assigned ", tiles_assigned, " tiles to regions.")
 
 func _clear_start_zone():
-	var center = Vector2i(grid_manager.grid_width / 2, grid_manager.grid_height / 2)
+	var center = Vector2i(
+		floori(float(grid_manager.grid_width) / 2.0),
+		floori(float(grid_manager.grid_height) / 2.0)
+	)
 	var plains_def = _get_definition_for_type(RegionDefinition.RegionType.PLAINS)
 	if plains_def == null:
 		print("ERROR: Plains definition not found for start zone!")
@@ -231,8 +234,11 @@ func _clear_start_zone():
 			var cell = Vector2i(x, y)
 			if not grid_manager.is_cell_in_bounds(cell): continue
 			
-			var dist = cell.distance_to(center)
-			if dist <= starter_resource_ring_radius and dist > inner_start_clear_radius:
+			var distance_squared = cell.distance_squared_to(center)
+			if (
+				distance_squared <= starter_resource_ring_radius * starter_resource_ring_radius
+				and distance_squared > inner_start_clear_radius * inner_start_clear_radius
+			):
 				var info = grid_manager.get_tile_info(cell)
 				var def = info.get("definition") as RegionDefinition
 				
@@ -251,7 +257,10 @@ func _clear_start_zone():
 				grid_manager.set_tile_info(cell, info)
 
 func _place_starter_resources():
-	var center = Vector2i(grid_manager.grid_width / 2, grid_manager.grid_height / 2)
+	var center = Vector2i(
+		floori(float(grid_manager.grid_width) / 2.0),
+		floori(float(grid_manager.grid_height) / 2.0)
+	)
 	var starter_types = [
 		BuildingData.ResourceType.WOOD,
 		BuildingData.ResourceType.FOOD,
@@ -272,14 +281,7 @@ func _place_starter_resources():
 			
 			if grid_manager.is_cell_in_bounds(cell):
 				if not resource_cells.has(cell):
-					# Check spacing
-					var too_close = false
-					for r_cell in resource_cells.keys():
-						if cell.distance_to(r_cell) < starter_resource_spacing_tiles:
-							too_close = true
-							break
-					
-					if not too_close:
+					if not _has_cell_within_spacing(cell, resource_cells, starter_resource_spacing_tiles):
 						_spawn_specific_resource_at(cell, res_type)
 						total_starter_resources_spawned += 1
 						placed = true
@@ -304,6 +306,9 @@ func _place_props_and_resources():
 	_shuffle_array(cells)
 	
 	for cell in cells:
+		if total_resources_spawned >= max_total_resource_nodes and total_props_spawned >= max_total_props:
+			break
+
 		var info = grid_manager.get_tile_info(cell)
 		var def = info.get("definition") as RegionDefinition
 		if def == null: continue
@@ -313,14 +318,14 @@ func _place_props_and_resources():
 			continue
 			
 		# Try Resources
-		if total_resources_spawned < max_total_resource_nodes:
+		if total_resources_spawned < max_total_resource_nodes and not def.resource_weights.is_empty():
 			if rng.randf() < def.resource_density:
 				if _can_spawn_resource_at(cell, def):
 					_spawn_resource_at(cell, def)
 					continue # Cell occupied by resource
 		
 		# Try Props
-		if total_props_spawned < max_total_props:
+		if total_props_spawned < max_total_props and not def.prop_weights.is_empty():
 			if rng.randf() < def.prop_density:
 				if _can_spawn_prop_at(cell, def):
 					_spawn_prop_at(cell, def)
@@ -344,20 +349,27 @@ func _can_spawn_prop_at(cell: Vector2i, def: RegionDefinition) -> bool:
 	return true
 
 func _is_too_close_to_resource(cell: Vector2i) -> bool:
-	for r_cell in resource_cells.keys():
-		if cell.distance_to(r_cell) < minimum_resource_spacing_tiles:
-			return true
-	return false
+	return _has_cell_within_spacing(cell, resource_cells, minimum_resource_spacing_tiles)
 
 func _is_too_close_to_prop(cell: Vector2i) -> bool:
-	# We also check resources as props shouldn't overlap resources
-	for r_cell in resource_cells.keys():
-		if cell.distance_to(r_cell) < minimum_prop_spacing_tiles:
-			return true
-			
-	for p_cell in prop_cells.keys():
-		if cell.distance_to(p_cell) < minimum_prop_spacing_tiles:
-			return true
+	return (
+		_has_cell_within_spacing(cell, resource_cells, minimum_prop_spacing_tiles)
+		or _has_cell_within_spacing(cell, prop_cells, minimum_prop_spacing_tiles)
+	)
+
+func _has_cell_within_spacing(cell: Vector2i, occupied_cells: Dictionary, spacing_tiles: int) -> bool:
+	if occupied_cells.is_empty() or spacing_tiles <= 0:
+		return false
+
+	var search_radius = maxi(spacing_tiles - 1, 0)
+	var spacing_squared = spacing_tiles * spacing_tiles
+
+	for y in range(cell.y - search_radius, cell.y + search_radius + 1):
+		for x in range(cell.x - search_radius, cell.x + search_radius + 1):
+			var occupied_cell = Vector2i(x, y)
+			if occupied_cells.has(occupied_cell) and cell.distance_squared_to(occupied_cell) < spacing_squared:
+				return true
+
 	return false
 
 func _spawn_resource_at(cell: Vector2i, def: RegionDefinition):
@@ -428,11 +440,13 @@ func _generate_region_labels():
 	# We use a fixed-seed shuffle or just step through if we want perfect spacing
 	_shuffle_array(potential_points) # RNG is already seeded with world_seed
 	
+	var min_label_spacing_squared = min_label_spacing * min_label_spacing
+
 	for pt in potential_points:
 		var pos = Vector2(pt["cell"])
 		var too_close = false
 		for lp in label_positions:
-			if pos.distance_to(lp) < min_label_spacing:
+			if pos.distance_squared_to(lp) < min_label_spacing_squared:
 				too_close = true
 				break
 		
@@ -442,38 +456,6 @@ func _generate_region_labels():
 			total_labels_drawn += 1
 	
 	print("Placed ", total_labels_drawn, " labels along borders.")
-
-func _array_to_lookup(arr: Array) -> Dictionary:
-	var d = {}
-	for item in arr:
-		d[item] = true
-	return d
-
-func _is_safe_label_spot(cell: Vector2i, my_type: int, buffer: int) -> bool:
-	for dy in range(-buffer, buffer + 1):
-		for dx in range(-buffer, buffer + 1):
-			var check_cell = cell + Vector2i(dx, dy)
-			if not grid_manager.is_cell_in_bounds(check_cell):
-				return false
-			var info = grid_manager.get_tile_info(check_cell)
-			if info.get("region_type") != my_type:
-				return false
-	return true
-
-func _find_best_centroid(cells: Array, lookup: Dictionary) -> Vector2i:
-	var avg = Vector2.ZERO
-	for c in cells:
-		avg += Vector2(c)
-	avg /= cells.size()
-	
-	var best_cell = cells[0]
-	var min_dist = INF
-	for c in cells:
-		var d = Vector2(c).distance_to(avg)
-		if d < min_dist:
-			min_dist = d
-			best_cell = c
-	return best_cell
 
 func _create_label_at_cell(cell: Vector2i, def: RegionDefinition):
 	if def == null: return

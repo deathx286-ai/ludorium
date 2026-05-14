@@ -129,4 +129,4 @@ func _update_status_label():
 	elif active_tab.has_method("get_debug_text"):
 		text = str(active_tab.call("get_debug_text"))
 
-	status_label.text = "DEBUG: %s | F1 hide/show | Tab switch" % text
+	status_label.text = "DEBUG: %s | %s | F1 hide/show | Tab switch" % [title, text]

@@ -8,6 +8,12 @@ const GROUP_ORDER_ATTACK_TARGET := 3
 const GROUP_ORDER_HARVEST := 4
 const ATTACK_CELL_NONE := Vector2i(-1, -1)
 const ATTACK_CELL_NO_SLOT_REQUIRED := Vector2i(-2, -2)
+const CARDINAL_DIRECTIONS: Array[Vector2i] = [
+	Vector2i(1, 0),
+	Vector2i(-1, 0),
+	Vector2i(0, 1),
+	Vector2i(0, -1)
+]
 
 @export var grid_manager: Node
 @export var defend_radius_tiles: int = 6
@@ -460,12 +466,7 @@ func clamp_group_anchor_cell(anchor_cell: Vector2i, max_shape_offset: Vector2i) 
 	)
 
 func get_cardinal_directions() -> Array[Vector2i]:
-	return [
-		Vector2i(1, 0),
-		Vector2i(-1, 0),
-		Vector2i(0, 1),
-		Vector2i(0, -1)
-	]
+	return CARDINAL_DIRECTIONS
 
 func get_closest_unit_to_position(units: Array[Node2D], position: Vector2) -> Node2D:
 	var closest_unit: Node2D = null

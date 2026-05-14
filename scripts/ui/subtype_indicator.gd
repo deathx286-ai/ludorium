@@ -34,7 +34,7 @@ func setup(data_or_subtype: Variant, footprint_size: Vector2i = Vector2i.ONE) ->
 	if data_or_subtype is Resource:
 		subtype = _get_subtype_for_data(data_or_subtype)
 	elif typeof(data_or_subtype) == TYPE_INT:
-		subtype = int(data_or_subtype)
+		subtype = _coerce_subtype(int(data_or_subtype))
 	else:
 		subtype = Subtype.AUTO
 
@@ -138,11 +138,18 @@ func _get_draw_size() -> Vector2:
 	return fallback_size
 
 
+func _coerce_subtype(value: int) -> Subtype:
+	if value == Subtype.AUTO or SHAPE_COLORS.has(value):
+		return value as Subtype
+
+	return Subtype.AUTO
+
+
 func _get_subtype_for_data(data: Resource) -> Subtype:
 	if data == null:
 		return Subtype.AUTO
 
-	var domain = int(data.get("unit_domain"))
+	var domain := int(data.get("unit_domain")) as UnitClassification.UnitDomain
 
 	match domain:
 		UnitClassification.UnitDomain.INFANTRY:
@@ -179,11 +186,11 @@ func _draw_polygon(points: PackedVector2Array, fill_color: Color, border_color: 
 		draw_line(start, end, border_color, width, true)
 
 
-func _regular_polygon(center: Vector2, radius: float, sides: int, rotation: float = 0.0) -> PackedVector2Array:
+func _regular_polygon(center: Vector2, radius: float, sides: int, angle_offset: float = 0.0) -> PackedVector2Array:
 	var points := PackedVector2Array()
 
 	for index in range(sides):
-		var angle := rotation + TAU * float(index) / float(sides)
+		var angle := angle_offset + TAU * float(index) / float(sides)
 		points.append(center + Vector2(cos(angle), sin(angle)) * radius)
 
 	return points

@@ -165,10 +165,12 @@ func get_auto_acquire_range_pixels(default_range_pixels: float, tile_size: float
 
 func is_world_position_allowed(world_position: Vector2, tile_size: float) -> bool:
 	if order_type == OrderType.DEFEND_AREA and has_anchor_position:
-		return anchor_position.distance_to(world_position) <= float(defend_radius_tiles) * tile_size
+		var defend_radius := float(defend_radius_tiles) * tile_size
+		return anchor_position.distance_squared_to(world_position) <= defend_radius * defend_radius
 
 	if order_type == OrderType.HOLD_POSITION and has_anchor_position:
-		return anchor_position.distance_to(world_position) <= float(chase_leash_tiles) * tile_size
+		var chase_radius := float(chase_leash_tiles) * tile_size
+		return anchor_position.distance_squared_to(world_position) <= chase_radius * chase_radius
 
 	return true
 

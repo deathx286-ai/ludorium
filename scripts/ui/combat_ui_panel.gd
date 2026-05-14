@@ -1,6 +1,7 @@
 extends Control
 
 @export var selection_manager: PlayerUnitSelectionManager
+@export var dynamic_refresh_interval: float = 0.1
 
 @onready var unit_portrait: TextureRect = %UnitPortrait
 @onready var unit_name_label: Label = %UnitNameLabel
@@ -14,9 +15,11 @@ extends Control
 @onready var target_label: Label = %TargetLabel
 
 var selected_unit: Node2D = null
+var dynamic_refresh_timer: float = 0.0
 
 func _ready():
 	visible = false
+	set_process(false)
 	if selection_manager == null:
 		selection_manager = get_tree().get_first_node_in_group("player_selection_manager")
 	
@@ -26,14 +29,18 @@ func _ready():
 	else:
 		push_warning("CombatUIPanel: PlayerSelectionManager not found!")
 
-func _process(_delta):
+func _process(delta):
 	if visible and is_instance_valid(selected_unit):
-		update_dynamic_stats()
+		dynamic_refresh_timer -= delta
+		if dynamic_refresh_timer <= 0.0:
+			dynamic_refresh_timer = dynamic_refresh_interval
+			update_dynamic_stats()
 
 func _on_selection_changed(units: Array[Node2D]):
 	if units.is_empty():
 		selected_unit = null
 		visible = false
+		set_process(false)
 		return
 	
 	var unit = units[0]
@@ -45,12 +52,15 @@ func _on_selection_changed(units: Array[Node2D]):
 		
 	if is_instance_valid(unit) and not is_building:
 		selected_unit = unit
+		dynamic_refresh_timer = 0.0
 		update_static_stats()
 		update_dynamic_stats()
 		visible = true
+		set_process(true)
 	else:
 		selected_unit = null
 		visible = false
+		set_process(false)
 
 func update_static_stats():
 	if not is_instance_valid(selected_unit):

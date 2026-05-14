@@ -947,5 +947,7 @@ func _spawn_subtype_indicator():
 
 	indicator.z_index = 2
 	if indicator.has_method("setup"):
-		var indicator_source: Variant = unit_data if subtype == Subtype.AUTO else int(subtype)
-		indicator.setup(indicator_source, Vector2i(footprint_width, footprint_height))
+		if subtype == Subtype.AUTO:
+			indicator.setup(unit_data, Vector2i(footprint_width, footprint_height))
+		else:
+			indicator.setup(int(subtype), Vector2i(footprint_width, footprint_height))

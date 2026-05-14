@@ -217,7 +217,7 @@ func has_reached_order_destination() -> bool:
 			and movement_component.is_settled()
 		)
 
-	return global_position.distance_to(combat_orders.destination) <= waypoint_arrival_distance
+	return global_position.distance_squared_to(combat_orders.destination) <= waypoint_arrival_distance * waypoint_arrival_distance
 
 func settle_or_step(delta: float):
 	if movement_component.is_moving:

@@ -34,6 +34,8 @@ var attack_target: Node2D = null
 var is_destroyed: bool = false
 var construction_component: ConstructionComponent = null
 var production_component: ProductionComponent = null
+var cached_grid_manager: Node = null
+var cached_occupancy_manager: Node = null
 
 @onready var sprite: Sprite2D = get_node_or_null("Sprite2D")
 @onready var body_collision: CollisionShape2D = get_node_or_null("CollisionShape2D")
@@ -57,7 +59,7 @@ func _ready():
 	if world_manager != null and is_enemy_camp_structure():
 		world_manager.register_enemy_camp()
 
-	var occupancy_manager = get_tree().get_first_node_in_group("grid_occupancy_manager")
+	var occupancy_manager = get_occupancy_manager()
 	if occupancy_manager != null:
 		occupancy_manager.register_node(self)
 
@@ -183,7 +185,7 @@ func take_damage(amount: int):
 func die():
 	is_destroyed = true
 
-	var occupancy_manager = get_tree().get_first_node_in_group("grid_occupancy_manager")
+	var occupancy_manager = get_occupancy_manager()
 	if occupancy_manager != null:
 		occupancy_manager.unregister_node(self)
 
@@ -206,7 +208,7 @@ func die():
 	queue_free()
 
 func get_tile_size() -> int:
-	var grid_manager = get_tree().get_first_node_in_group("grid_manager")
+	var grid_manager = get_grid_manager()
 
 	if grid_manager != null:
 		return grid_manager.tile_size
@@ -284,10 +286,11 @@ func is_target_in_attack_tile_range(target: Node2D) -> bool:
 	if target == null or attack_range_tiles <= 0:
 		return false
 
-	var grid_manager = get_tree().get_first_node_in_group("grid_manager")
+	var grid_manager = get_grid_manager()
 
 	if grid_manager == null:
-		return global_position.distance_to(target.global_position) <= float(attack_range_tiles * fallback_tile_size)
+		var attack_range_pixels := float(attack_range_tiles * fallback_tile_size)
+		return global_position.distance_squared_to(target.global_position) <= attack_range_pixels * attack_range_pixels
 
 	var self_cells = grid_manager.get_footprint_cells_for_node(self)
 	var target_cells = grid_manager.get_footprint_cells_for_node(target)
@@ -397,6 +400,18 @@ func set_selected(selected: bool):
 	
 	if classification_label != null:
 		classification_label.visible = selected
+
+func get_grid_manager():
+	if cached_grid_manager == null or not is_instance_valid(cached_grid_manager):
+		cached_grid_manager = get_tree().get_first_node_in_group("grid_manager")
+
+	return cached_grid_manager
+
+func get_occupancy_manager():
+	if cached_occupancy_manager == null or not is_instance_valid(cached_occupancy_manager):
+		cached_occupancy_manager = get_tree().get_first_node_in_group("grid_occupancy_manager")
+
+	return cached_occupancy_manager
 
 func _spawn_subtype_indicator():
 	if Engine.is_editor_hint():

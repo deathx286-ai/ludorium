@@ -155,12 +155,15 @@ func toggle_placement_enabled():
 		print("Switched to PLACEMENT mode")
 
 func toggle_mode():
-	placement_mode = PlacementMode.BUILDINGS if placement_mode == PlacementMode.UNITS else PlacementMode.UNITS
+	if placement_mode == PlacementMode.UNITS:
+		placement_mode = PlacementMode.BUILDINGS
+	else:
+		placement_mode = PlacementMode.UNITS
 	selected_index = 0
 	_update_status_label()
 
 func set_placement_mode(new_mode: int):
-	placement_mode = clampi(new_mode, PlacementMode.UNITS, PlacementMode.BUILDINGS)
+	placement_mode = clampi(new_mode, PlacementMode.UNITS, PlacementMode.BUILDINGS) as PlacementMode
 	selected_index = 0
 	_update_status_label()
 
@@ -168,25 +171,25 @@ func cycle_category(direction: int):
 	if placement_mode != PlacementMode.UNITS:
 		return
 
-	selected_unit_category = wrapi(selected_unit_category + direction, 0, UNIT_CATEGORY_COUNT)
+	selected_unit_category = wrapi(selected_unit_category + direction, 0, UNIT_CATEGORY_COUNT) as UnitCategory
 	selected_unit_archetype_index = 0
 	selected_index = 0
 	_update_status_label()
 
 func set_unit_category(new_category: int):
-	selected_unit_category = clampi(new_category, 0, UNIT_CATEGORY_COUNT - 1)
+	selected_unit_category = clampi(new_category, 0, UNIT_CATEGORY_COUNT - 1) as UnitCategory
 	selected_unit_archetype_index = 0
 	selected_index = 0
 	_update_status_label()
 
 func set_building_category(new_category: int):
-	selected_building_category = clampi(new_category, 0, BUILDING_CATEGORY_COUNT - 1)
+	selected_building_category = clampi(new_category, 0, BUILDING_CATEGORY_COUNT - 1) as BuildingCategory
 	selected_index = 0
 	_update_status_label()
 
 func cycle_archetype(direction: int):
 	if placement_mode == PlacementMode.BUILDINGS:
-		selected_building_category = wrapi(selected_building_category + direction, 0, BUILDING_CATEGORY_COUNT)
+		selected_building_category = wrapi(selected_building_category + direction, 0, BUILDING_CATEGORY_COUNT) as BuildingCategory
 		selected_index = 0
 		_update_status_label()
 		return
@@ -225,7 +228,7 @@ func cycle_allegiance_override(direction: int):
 		selected_allegiance_override + direction,
 		0,
 		PLACEMENT_ALLEGIANCE_OVERRIDE_COUNT
-	)
+	) as PlacementAllegianceOverride
 	_update_status_label()
 
 func cycle_selected(direction: int):
@@ -325,11 +328,11 @@ func validate_building_placement(building_data: Resource, owner_nation: Resource
 		# If road supply says it's valid, we STILL need to check occupancy
 		# unless ignore_placement_rules_mode is on
 		if not ignore_placement_rules_mode:
-			var footprint_width = maxi(int(building_data.get("footprint_width")), 1)
-			var footprint_height = maxi(int(building_data.get("footprint_height")), 1)
-			var snapped_world_position = grid_manager.snap_world_to_footprint_center(grid_manager.cell_to_world(cell), footprint_width, footprint_height)
+			var road_supply_footprint_width = maxi(int(building_data.get("footprint_width")), 1)
+			var road_supply_footprint_height = maxi(int(building_data.get("footprint_height")), 1)
+			var road_supply_world_position = grid_manager.snap_world_to_footprint_center(grid_manager.cell_to_world(cell), road_supply_footprint_width, road_supply_footprint_height)
 			
-			if grid_occupancy_manager != null and not grid_occupancy_manager.can_occupy_world_position(snapped_world_position, footprint_width, footprint_height):
+			if grid_occupancy_manager != null and not grid_occupancy_manager.can_occupy_world_position(road_supply_world_position, road_supply_footprint_width, road_supply_footprint_height):
 				return _record_validation(false, EconomyTypes.PlacementFailure.OCCUPIED_CELL, cell)
 		
 		last_validation_result = result
